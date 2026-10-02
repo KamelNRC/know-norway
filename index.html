@@ -58,6 +58,17 @@
   .brand-name{font-family:var(--font-display); font-weight:600; font-size:1.08rem; white-space:nowrap;}
   .mini-countdown{font-family:var(--font-mono); font-size:.74rem; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums;}
   .mini-countdown b{color:var(--ink); font-size:.9rem;}
+  button.mini-countdown{background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:6px 10px; min-height:32px; cursor:pointer;}
+  .board[role="button"]{cursor:pointer;}
+  .board[role="button"]:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+  .date-dialog{border:none; border-radius:var(--radius-l); padding:20px; width:min(92vw,380px); background:var(--surface); color:var(--ink); box-shadow:var(--shadow-card);}
+  .date-dialog::backdrop{background:rgba(0,0,0,.45);}
+  .date-dialog h2{margin:0 0 6px; font-size:1.25rem;}
+  .date-dialog p{margin:0 0 14px; color:var(--ink-soft); font-size:.92rem;}
+  .date-dialog label{display:block; font-family:var(--font-mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px;}
+  .date-dialog input{width:100%; box-sizing:border-box; min-height:48px; padding:10px 12px; font-size:1rem; border:1px solid var(--line); border-radius:var(--radius-m); background:var(--paper); color:var(--ink);}
+  .date-actions{display:flex; gap:10px; margin-top:16px;}
+  .date-actions .btn{flex:1;}
 
   /* main column */
   main{max-width:640px; margin:0 auto; padding-inline:16px; padding-block:18px calc(env(safe-area-inset-bottom,0px) + 28px);}
@@ -191,7 +202,7 @@
     <span class="brand-name" data-i18n="brand"></span>
   </button>
   <div class="top-right">
-    <div class="mini-countdown" id="miniCountdown"></div>
+    <button type="button" class="mini-countdown" id="miniCountdown"></button>
     <div class="lang-switch" role="group" aria-label="Language / Språk">
       <button id="langEn" data-lang="en" aria-pressed="true">EN</button>
       <button id="langNo" data-lang="no" aria-pressed="false">NO</button>
@@ -223,8 +234,8 @@
       <h1 data-i18n="h1"></h1>
       <p data-i18n="lede"></p>
     </div>
-    <div class="board">
-      <div class="board-row"><span class="board-label" data-i18n="nextTest"></span><span class="board-window" data-i18n="window"></span></div>
+    <div class="board" id="countdownBoard" role="button" tabindex="0">
+      <div class="board-row"><span class="board-label" data-i18n="nextTest"></span><span class="board-window" id="boardWindow"></span></div>
       <div class="board-row" style="align-items:center;"><div class="board-digits" id="boardDigits"></div><div class="board-status" id="boardStatus"></div></div>
     </div>
     <div class="stat-row four" id="homeStats"></div>
@@ -276,6 +287,19 @@
     <button class="btn btn-block back-home" data-go="home">← <span data-i18n="backHome"></span></button>
   </section>
 </main>
+
+<dialog class="date-dialog" id="dateDialog" aria-labelledby="dateTitle">
+  <form id="dateForm">
+    <h2 id="dateTitle" data-i18n="dateTitle"></h2>
+    <p data-i18n="dateHelp"></p>
+    <label for="dateInput" data-i18n="dateLabel"></label>
+    <input type="date" id="dateInput" required>
+    <div class="date-actions">
+      <button type="button" class="btn" id="dateCancel" data-i18n="dateCancel"></button>
+      <button type="submit" class="btn btn-primary" data-i18n="dateSave"></button>
+    </div>
+  </form>
+</dialog>
 
 
 
@@ -1169,8 +1193,6 @@ const DOC196_EN = [
 
 [[QUIZ_BANK, DOC196_EN], [QUIZ_BANK_NO, DOC196_NO]].forEach(([bank, doc])=>{ doc.forEach(q=>{ bank[q[4]].push(q); }); });
 
-const TEST_START = new Date(2026,10,30);
-const TEST_END   = new Date(2026,11,4);
 const MODULE_TITLE_EN = {m1:'Education, skills and working life', m2:'Family, health and everyday life', m3:'Norway, then and now'};
 
 /* ---------- interface text ---------- */
@@ -1180,7 +1202,9 @@ const UI = {
     eyebrow:'Social studies test · Permanent residence',
     h1:'Prepare for the social studies test',
     lede:'38 multiple-choice questions, 60 minutes, 26 correct to pass. You can take the test in English or Norwegian. Read the three modules, run a timed mock exam, then work through all 196 practice questions.',
-    nextTest:'Next test', window:'30 NOV – 4 DEC 2026',
+    nextTest:'Your test date', noDate:'Not set',
+    daysUntil:n=>n===1?'day until your test':'days until your test', testToday:'Your test is today. Good luck!', testPassed:'Your test date has passed. Tap to set a new date.', tapToSet:'Tap to set your test date',
+    miniSet:'Set date', dateTitle:'When is your test?', dateHelp:'Pick the date of your social studies test. It is saved on this device only, and you can change it any time by tapping the days counter.', dateSave:'Save', dateCancel:'Later', dateLabel:'Test date',
     goStudyT:'Read the modules', goStudyS:'The three curriculum modules, topic by topic',
     goQuizT:'10-question topic quiz', goQuizS:'Drill one module at a time',
     goMockT:'Timed mock exam', goMockS:'38 questions, 60 minutes, pass at 26',
@@ -1213,7 +1237,9 @@ const UI = {
     eyebrow:'Samfunnskunnskapsprøven · Permanent oppholdstillatelse',
     h1:'Forbered deg til samfunnskunnskapsprøven',
     lede:'38 flervalgsspørsmål, 60 minutter, 26 riktige for å bestå. Du kan ta prøven på norsk eller engelsk. Les de tre modulene, ta en prøveeksamen med tid, og jobb deg gjennom alle 196 øvingsspørsmålene.',
-    nextTest:'Neste prøve', window:'30. NOV – 4. DES 2026',
+    nextTest:'Din prøvedato', noDate:'Ikke valgt',
+    daysUntil:n=>n===1?'dag til prøven din':'dager til prøven din', testToday:'Prøven din er i dag. Lykke til!', testPassed:'Prøvedatoen din er passert. Trykk for å velge en ny dato.', tapToSet:'Trykk for å velge prøvedato',
+    miniSet:'Velg dato', dateTitle:'Når er prøven din?', dateHelp:'Velg datoen for samfunnskunnskapsprøven din. Den lagres bare på denne enheten, og du kan endre den når som helst ved å trykke på dagtelleren.', dateSave:'Lagre', dateCancel:'Senere', dateLabel:'Prøvedato',
     goStudyT:'Les modulene', goStudyS:'De tre læreplanmodulene, tema for tema',
     goQuizT:'Temaquiz med 10 spørsmål', goQuizS:'Øv på én modul om gangen',
     goMockT:'Prøveeksamen med tid', goMockS:'38 spørsmål, 60 minutter, bestått ved 26',
@@ -1279,17 +1305,47 @@ document.querySelectorAll('.lang-switch button').forEach(b=> b.onclick=()=>{
 });
 
 /* ---------- countdown ---------- */
+function parseTestDate(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');
+  return m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
+}
+function isoDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function renderCountdown(){
-  const now = new Date();
-  const toStart = daysBetween(now, TEST_START), toEnd = daysBetween(now, TEST_END);
+  const test = parseTestDate(state.testDate);
   let digits, status, mini;
-  if(toStart > 0){ digits = String(toStart).padStart(3,'0').split(''); status = T('daysLeft')(toStart); mini = T('miniDays')(toStart); }
-  else if(toEnd >= 0){ digits = String(Math.max(toEnd,0)).padStart(2,'0').split(''); status = T('windowOpen'); mini = T('miniOpen'); }
-  else { digits = ['–','–']; status = T('windowPassed'); mini = T('miniPassed'); }
+  if(!test){ digits = ['–','–','–']; status = T('tapToSet'); mini = T('miniSet'); }
+  else {
+    const left = daysBetween(new Date(), test);
+    if(left > 0){ digits = String(left).padStart(3,'0').split(''); status = T('daysUntil')(left); mini = T('miniDays')(left); }
+    else if(left === 0){ digits = ['0','0','0']; status = T('testToday'); mini = T('miniOpen'); }
+    else { digits = ['–','–','–']; status = T('testPassed'); mini = T('miniPassed'); }
+  }
   $('boardDigits').innerHTML = digits.map(d=>'<span class="board-cell">'+d+'</span>').join('');
   $('boardStatus').textContent = status;
+  $('boardWindow').textContent = test
+    ? test.toLocaleDateString(state.lang==='no'?'nb-NO':'en-GB',{day:'numeric',month:'short',year:'numeric'}).toUpperCase()
+    : T('noDate');
   $('miniCountdown').innerHTML = mini;
 }
+
+/* ---------- test date picker ---------- */
+function openDateDialog(){
+  const dlg = $('dateDialog'), input = $('dateInput');
+  input.min = isoDate(new Date());
+  input.value = state.testDate || '';
+  if(dlg.showModal) dlg.showModal(); else dlg.setAttribute('open','');
+  input.focus();
+}
+function closeDateDialog(){ const dlg = $('dateDialog'); if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+$('dateForm').onsubmit = e=>{
+  e.preventDefault();
+  if(!parseTestDate($('dateInput').value)){ $('dateInput').focus(); return; }
+  state.testDate = $('dateInput').value; saveState(); renderCountdown(); closeDateDialog();
+};
+$('dateCancel').onclick = closeDateDialog;
+$('miniCountdown').onclick = openDateDialog;
+$('countdownBoard').onclick = openDateDialog;
+$('countdownBoard').onkeydown = e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openDateDialog(); } };
 
 /* ---------- navigation ---------- */
 const TABS = ['home','study','mock','all'];
@@ -1475,4 +1531,5 @@ applyLang();
 const hashTab = (location.hash||'').slice(1);
 showTab(TABS.includes(hashTab) ? hashTab : 'home', true);
 setInterval(renderCountdown, 60000);
+if(!state.testDate) openDateDialog();
 </script>
