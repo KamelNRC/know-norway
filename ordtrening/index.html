@@ -1,0 +1,1877 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Norsk Ordtrening</title>
+<meta name="theme-color" content="#1f3a5f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: single centred study column — deck picker, mode tabs, one big practice stage; stacks cleanly at phone width. */
+  :root{
+    --bg:#eaeef2; --surface:#ffffff; --surface-2:#f3f5f8; --line:#d3dae2;
+    --ink:#142130; --ink-soft:#4a5867; --ink-faint:#6f7c8a;
+    --accent:#1f3a5f; --accent-soft:#dbe4ef; --on-accent:#ffffff;
+    --flag:#b3202b; --flag-soft:#f6dfe1;
+    --good:#1c7a4c; --good-soft:#d9efe3; --bad:#b3202b; --bad-soft:#f6dfe1;
+    --font-display:'Young Serif',Georgia,'Times New Roman',serif;
+    --font-body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+    --r:12px; --r-l:18px;
+    --shadow:0 1px 2px rgba(20,33,48,.06),0 10px 30px -16px rgba(20,33,48,.35);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e141b; --surface:#161f29; --surface-2:#1c2733; --line:#2b3846;
+      --ink:#e5ebf1; --ink-soft:#a9b6c3; --ink-faint:#83919f;
+      --accent:#9cbfe6; --accent-soft:#1f3044; --on-accent:#0e141b;
+      --flag:#ff7b84; --flag-soft:#3a1f24;
+      --good:#5fcf95; --good-soft:#173628; --bad:#ff7b84; --bad-soft:#3a1f24;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -16px rgba(0,0,0,.7);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e141b; --surface:#161f29; --surface-2:#1c2733; --line:#2b3846;
+    --ink:#e5ebf1; --ink-soft:#a9b6c3; --ink-faint:#83919f;
+    --accent:#9cbfe6; --accent-soft:#1f3044; --on-accent:#0e141b;
+    --flag:#ff7b84; --flag-soft:#3a1f24;
+    --good:#5fcf95; --good-soft:#173628; --bad:#ff7b84; --bad-soft:#3a1f24;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;margin:0;padding-inline:16px;padding-block:20px 48px}
+  .wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+  h1,h2,h3{font-family:var(--font-display);font-weight:400;margin:0;text-wrap:balance}
+  button,input{font-family:inherit;font-size:inherit;color:inherit}
+  button{cursor:pointer;touch-action:manipulation}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  .label{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+
+  /* Header */
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;gap:2px}
+  .brand h1{font-size:clamp(1.7rem,4.5vw,2.3rem);line-height:1.1}
+  .brand h1 .cross{display:inline-block;width:.62em;height:.46em;margin-left:.3em;vertical-align:.05em;border-radius:2px;
+    background:linear-gradient(var(--flag),var(--flag)) 0 0/100% 100%;position:relative}
+  .brand h1 .cross::before{content:"";position:absolute;inset:0;background:
+    linear-gradient(90deg,transparent 30%,var(--surface) 30%,var(--surface) 46%,transparent 46%),
+    linear-gradient(transparent 40%,var(--surface) 40%,var(--surface) 60%,transparent 60%)}
+  .brand p{margin:0;color:var(--ink-soft)}
+  .stats{display:flex;gap:18px;font-variant-numeric:tabular-nums}
+  .stat{display:flex;flex-direction:column;align-items:flex-end}
+  .stat b{font-family:var(--font-display);font-weight:400;font-size:1.5rem;line-height:1.1}
+  .stat span{font-size:.8rem;color:var(--ink-faint)}
+
+  /* Deck picker */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:16px;display:flex;flex-direction:column;gap:12px}
+  .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+  .seg button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-weight:700;color:var(--ink-soft)}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+  .row{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap}
+  .row.between{justify-content:space-between}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;font-size:.88rem;color:var(--ink-soft);display:inline-flex;gap:6px;align-items:center}
+  .chip small{color:var(--ink-faint);font-variant-numeric:tabular-nums}
+  .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+  .toggle{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;color:var(--ink-soft);cursor:pointer;user-select:none}
+  .toggle input{width:18px;height:18px;accent-color:var(--accent)}
+  .poolinfo{font-size:.9rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+  .bar i{display:block;height:100%;background:var(--good);width:0;transition:width .4s}
+
+  /* Mode tabs */
+  nav.modes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  nav.modes button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.2}
+  nav.modes button b{font-size:.95rem}
+  nav.modes button span{font-size:.72rem;color:var(--ink-faint)}
+  nav.modes button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
+  nav.modes button[aria-pressed="true"] span{color:var(--on-accent);opacity:.8}
+  @media (max-width:620px){nav.modes{grid-template-columns:repeat(3,1fr)}}
+
+  /* Stage */
+  .stage{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--shadow);padding:20px;min-height:380px;display:flex;flex-direction:column;gap:16px}
+  .stage-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .dir{font-size:.85rem}
+  .count{font-variant-numeric:tabular-nums;color:var(--ink-faint);font-size:.9rem}
+  .empty{margin:auto;text-align:center;color:var(--ink-soft);max-width:40ch}
+
+  /* Flashcard */
+  .card-scene{perspective:1200px;flex:1;display:flex}
+  .card{position:relative;width:100%;min-height:260px;flex:1;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,.7,.3,1);cursor:pointer;border:0;background:none;padding:0;text-align:center}
+  .card.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r-l);border:1px solid var(--line);background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px}
+  .face.back{transform:rotateY(180deg);background:var(--surface)}
+  .big{font-family:var(--font-display);font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.15;overflow-wrap:anywhere}
+  .mid{font-size:clamp(1.15rem,3.6vw,1.45rem);font-weight:700;overflow-wrap:anywhere}
+  .tag{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+  .hint{font-size:.85rem;color:var(--ink-faint)}
+  .forms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;max-width:520px}
+  .forms div{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;gap:2px}
+  .forms em{font-style:normal;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+  .forms code{font-family:var(--font-mono);font-size:.95rem;overflow-wrap:anywhere}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:11px 18px;font-weight:700;min-width:120px}
+  .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  .btn.good{background:var(--good-soft);border-color:var(--good);color:var(--ink)}
+  .btn.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--ink)}
+  .btn kbd{font-family:var(--font-mono);font-size:.72rem;opacity:.6;margin-left:6px}
+  .speak{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:38px;height:38px;display:inline-grid;place-items:center;flex:none}
+  .speak svg{width:18px;height:18px;fill:currentColor}
+  .boxes{display:flex;gap:3px;justify-content:center}
+  .boxes i{width:14px;height:5px;border-radius:3px;background:var(--line)}
+  .boxes i.on{background:var(--good)}
+
+  /* Quiz */
+  .prompt{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;padding-block:10px}
+  .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  @media (max-width:560px){.opts{grid-template-columns:1fr}}
+  .opt{border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r);padding:14px;text-align:left;display:flex;gap:10px;align-items:flex-start;font-size:1.02rem;min-width:0}
+  .opt kbd{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:0 5px;flex:none;margin-top:2px}
+  .opt span{min-width:0;overflow-wrap:anywhere}
+  .opt.right{background:var(--good-soft);border-color:var(--good)}
+  .opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+  .opt:disabled{cursor:default}
+  .feedback{min-height:1.5em;text-align:center;font-weight:700}
+  .feedback.ok{color:var(--good)} .feedback.no{color:var(--bad)}
+
+  /* Match */
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .match .col{display:flex;flex-direction:column;gap:8px;min-width:0}
+  .tile{border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r);padding:12px;min-height:54px;text-align:left;font-size:.98rem;overflow-wrap:anywhere;transition:background .15s,border-color .15s,opacity .3s}
+  .tile.no{font-family:var(--font-display);font-size:1.08rem}
+  .tile.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .tile.done{background:var(--good-soft);border-color:var(--good);opacity:.55;cursor:default}
+  .tile.err{background:var(--bad-soft);border-color:var(--bad)}
+
+  /* Write / Conjugate */
+  .answer{display:flex;flex-direction:column;gap:10px;max-width:520px;width:100%;margin:0 auto}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+  .inwrap{display:flex;align-items:center;border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r);overflow:hidden}
+  .inwrap span{padding-left:12px;color:var(--ink-faint);font-family:var(--font-mono)}
+  .inwrap input{flex:1;min-width:0;border:0;background:transparent;padding:12px;font-family:var(--font-mono);font-size:1.05rem;outline:none}
+  .inwrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .inwrap.ok{border-color:var(--good);background:var(--good-soft)}
+  .inwrap.no{border-color:var(--bad);background:var(--bad-soft)}
+  .fix{font-family:var(--font-mono);font-size:.9rem;color:var(--good);min-height:1.3em}
+  .keys{display:flex;gap:6px;justify-content:center}
+  .keys button{border:1px solid var(--line);background:var(--surface);border-radius:8px;width:42px;height:38px;font-family:var(--font-mono);font-size:1.05rem}
+
+  /* List */
+  .search{border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r);padding:10px 12px;width:100%}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);max-height:560px;overflow-y:auto}
+  table{border-collapse:collapse;width:100%;font-size:.93rem}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{position:sticky;top:0;background:var(--surface-2);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);z-index:1}
+  td.no{font-weight:700}
+  td.f{font-family:var(--font-mono);font-size:.86rem;white-space:nowrap}
+  td.dot{width:18px;padding-right:0}
+  td.dot i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--line)}
+  td.dot i.l{background:var(--good)} td.dot i.p{background:#d4a017}
+  .catrow td{background:var(--accent-soft);font-weight:700;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)}
+
+  footer{color:var(--ink-faint);font-size:.82rem;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .linkbtn{border:0;background:none;color:var(--ink-faint);text-decoration:underline;padding:0}
+  .confirm{display:inline-flex;gap:8px;align-items:center}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+  @media (max-width:560px){.stage{padding:14px}.stats{gap:12px}.btn{min-width:0;flex:1}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Norsk Ordtrening<span class="cross" aria-hidden="true"></span></h1>
+      <p>Verb fra VERB.pdf og VerbStor.pdf, pluss vanlige ord. Every word has its English meaning.</p>
+    </div>
+    <div class="stats" aria-label="Fremgang">
+      <div class="stat"><b id="stLearned">0</b><span>lært / learned</span></div>
+      <div class="stat"><b id="stTotal">0</b><span>ord totalt</span></div>
+    </div>
+  </header>
+
+  <section class="panel" aria-label="Velg ordliste">
+    <div class="row between">
+      <div class="seg" role="group" aria-label="Ordliste">
+        <button id="dVerb" data-deck="verb">Verb</button>
+        <button id="dWord" data-deck="word">Ordforråd</button>
+        <button id="dAll" data-deck="all">Alt</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="onlyNew"> Bare ord jeg ikke kan ennå</label>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="row between">
+      <span class="poolinfo" id="poolInfo"></span>
+      <div style="flex:1;min-width:140px;max-width:300px" class="bar"><i id="poolBar"></i></div>
+    </div>
+  </section>
+
+  <nav class="modes" aria-label="Øvingsmåte">
+    <button data-mode="cards"><b>Kort</b><span>Flashcards</span></button>
+    <button data-mode="quiz"><b>Flervalg</b><span>Quiz</span></button>
+    <button data-mode="match"><b>Par</b><span>Matching</span></button>
+    <button data-mode="write"><b>Skriv</b><span>Type it</span></button>
+    <button data-mode="conj"><b>Bøying</b><span>Verb forms</span></button>
+    <button data-mode="list"><b>Liste</b><span>Browse all</span></button>
+  </nav>
+
+  <main class="stage" id="stage" aria-live="polite"></main>
+
+  <footer>
+    <span>Fremgangen lagres i denne nettleseren. Progress is saved in this browser.</span>
+    <span class="confirm" id="resetWrap"><button class="linkbtn" id="resetBtn">Nullstill fremgang</button></span>
+  </footer>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+/* Verbs: infinitive|presens|preteritum|perfektum (without "har")|English. Alternatives separated by "/". */
+const VERB_DATA = `
+# aux
+være|er|var|vært|be
+ha|har|hadde|hatt|have
+# modal
+burde|bør|burde|burdet|should, ought to
+kunne|kan|kunne|kunnet|can, be able to
+måtte|må|måtte|måttet|must, have to
+skulle|skal|skulle|skullet|shall, be going to
+ville|vil|ville|villet|want to, will
+# et
+åpne|åpner|åpnet|åpnet|open
+arbeide|arbeider|arbeidet|arbeidet|work
+bade|bader|badet|badet|bathe, swim
+banke|banker|banket|banket|knock, beat, hit
+bearbeide|bearbeider|bearbeidet|bearbeidet|process, work on
+behandle|behandler|behandlet|behandlet|treat, handle
+bjeffe|bjeffer|bjeffet|bjeffet|bark
+blande|blander|blandet|blandet|mix, blend
+bytte|bytter|byttet|byttet|switch, exchange, change
+danse|danser|danset|danset|dance
+dusje|dusjer|dusjet|dusjet|shower
+dyrke|dyrker|dyrket|dyrket|grow, cultivate
+dytte|dytter|dyttet|dyttet|push
+feire|feirer|feiret|feiret|celebrate
+fiske|fisker|fisket|fisket|fish
+flykte|flykter|flyktet|flyktet|flee, run away
+flytte|flytter|flyttet|flyttet|move (home); move
+fornye|fornyer|fornyet|fornyet|renew
+fosse|fosser|fosset|fosset|gush, pour
+gifte seg|gifter seg|giftet seg|giftet seg|get married
+gjette|gjetter|gjettet|gjettet|guess
+glede seg|gleder seg|gledet seg|gledet seg|look forward to; be glad
+grense|grenser|grenset|grenset|border (on)
+handle|handler|handlet|handlet|shop; act
+håpe|håper|håpet|håpet|hope
+hente|henter|hentet|hentet|fetch, pick up
+hindre|hindrer|hindret|hindret|prevent, hinder
+hoste|hoster|hostet|hostet|cough
+høste|høster|høstet|høstet|harvest
+huske|husker|husket|husket|remember
+hoppe|hopper|hoppet|hoppet|jump
+hviske|hvisker|hvisket|hvisket|whisper
+hygge seg|hygger seg|hygget seg|hygget seg|have a nice time, enjoy oneself
+jobbe|jobber|jobbet|jobbet|work
+kaste|kaster|kastet|kastet|throw; throw away
+klatre|klatrer|klatret|klatret|climb
+knytte|knytter|knyttet/knøt|knyttet/knytt|tie, connect
+kontakte|kontakter|kontaktet|kontaktet|contact
+koste|koster|kostet|kostet|cost
+lage|lager|laget|laget|make
+ligne|ligner|lignet|lignet|resemble, look like
+løfte|løfter|løftet|løftet|lift
+love|lover|lovet|lovet|promise
+lukte|lukter|luktet|luktet|smell
+lytte|lytter|lyttet|lyttet|listen
+merke|merker|merket|merket|notice; mark
+miste|mister|mistet|mistet|lose (something)
+nekte|nekter|nektet|nektet|refuse, deny
+omarbeide|omarbeider|omarbeidet|omarbeidet|revise, rework
+overnatte|overnatter|overnattet|overnattet|stay overnight
+passe|passer|passet|passet|fit, suit; look after
+plystre|plystrer|plystret|plystret|whistle
+pusse|pusser|pusset|pusset|polish; brush (teeth)
+putte|putter|puttet|puttet|put
+pynte|pynter|pyntet|pyntet|decorate
+råde|råder|rådet|rådet|advise
+regne|regner|regnet|regnet|rain; calculate
+rense|renser|renset|renset|clean, purify
+rette|retter|rettet|rettet|straighten; correct
+rydde|rydder|ryddet|ryddet|tidy up
+sage|sager|saget|saget|saw
+samarbeide|samarbeider|samarbeidet|samarbeidet|cooperate
+sammenligne|sammenligner|sammenlignet|sammenlignet|compare
+savne|savner|savnet|savnet|miss, long for
+sikte|sikter|siktet|siktet|aim; charge (with a crime)
+skifte|skifter|skiftet|skiftet|change, shift
+slutte|slutter|sluttet|sluttet|stop, quit, end
+sminke|sminker|sminket|sminket|put on make-up
+smitte|smitter|smittet|smittet|infect
+snakke|snakker|snakket|snakket|speak, talk
+sovne|sovner|sovnet|sovnet|fall asleep
+sparke|sparker|sparket|sparket|kick; fire (from a job)
+spikre|spikrer|spikret|spikret|nail
+starte|starter|startet|startet|start
+stave|staver|stavet|stavet|spell
+stevne|stevner|stevnet|stevnet|summon (to court)
+stoppe|stopper|stoppet|stoppet|stop
+strikke|strikker|strikket|strikket|knit
+sykle|sykler|syklet|syklet|cycle, ride a bike
+tørke|tørker|tørket|tørket|dry; wipe
+våkne|våkner|våknet|våknet|wake up
+varme|varmer|varmet|varmet|warm, heat
+vaske|vasker|vasket|vasket|wash
+vekke|vekker|vekket|vekket|wake (someone) up
+vente|venter|ventet|ventet|wait
+verne|verner|vernet|vernet|protect, preserve
+vinke|vinker|vinket|vinket|wave
+ønske|ønsker|ønsket|ønsket|wish, want
+# te
+anbefale|anbefaler|anbefalte|anbefalt|recommend
+barbere|barberer|barberte|barbert|shave
+begynne|begynner|begynte|begynt|begin
+besøke|besøker|besøkte|besøkt|visit
+bestemme|bestemmer|bestemte|bestemt|decide
+bestille|bestiller|bestilte|bestilt|order, book
+betale|betaler|betalte|betalt|pay
+blåse|blåser|blåste|blåst|blow
+bruke|bruker|brukte|brukt|use
+dele|deler|delte|delt|share, divide
+diskutere|diskuterer|diskuterte|diskutert|discuss
+drepe|dreper|drepte|drept|kill
+drømme|drømmer|drømte|drømt|dream
+føde|føder|fødte|født|give birth (to)
+føle seg|føler seg|følte seg|følt seg|feel (tired, well …)
+forene|forener|forente|forent|unite
+forklare|forklarer|forklarte|forklart|explain
+fotografere|fotograferer|fotograferte|fotografert|photograph
+fylle|fyller|fylte|fylt|fill
+gjemme|gjemmer|gjemte|gjemt|hide
+glemme|glemmer|glemte|glemt|forget
+gratulere|gratulerer|gratulerte|gratulert|congratulate
+hende|hender|hendte|hendt|happen, occur
+henge|henger|hengte|hengt|hang (something up)
+hilse|hilser|hilste|hilst|greet, say hello
+høre|hører|hørte|hørt|hear
+hvile|hviler|hvilte|hvilt|rest
+interessere seg|interesserer seg|interesserte seg|interessert seg|be interested (in)
+invitere|inviterer|inviterte|invitert|invite
+kalkulere|kalkulerer|kalkulerte|kalkulert|calculate
+kjenne|kjenner|kjente|kjent|know (a person/place); feel
+kjøpe|kjøper|kjøpte|kjøpt|buy
+kjøre|kjører|kjørte|kjørt|drive
+klare|klarer|klarte|klart|manage, cope
+klippe|klipper|klippet/klipte|klippet/klipt|cut (hair), clip
+koke|koker|kokte|kokt|boil, cook
+kontrollere|kontrollerer|kontrollerte|kontrollert|check, control
+kopiere|kopierer|kopierte|kopiert|copy
+korrigere|korrigerer|korrigerte|korrigert|correct
+kose seg|koser seg|koste seg|kost seg|have a cosy time, enjoy oneself
+lære|lærer|lærte|lært|learn; teach
+låne|låner|lånte|lånt|borrow; lend
+låse|låser|låste|låst|lock
+leke|leker|lekte|lekt|play (children's play)
+lese|leser|leste|lest|read
+levere|leverer|leverte|levert|deliver, hand in
+like|liker|likte|likt|like
+løse|løser|løste|løst|solve
+måle|måler|målte|målt|measure
+mase|maser|maste|mast|nag, pester
+melde|melder|meldte|meldt|report, announce
+mene|mener|mente|ment|mean; think (have an opinion)
+møte|møter|møtte|møtt|meet
+nyse|nyser|nøs/nyste|nøset/nyst|sneeze
+oppsøke|oppsøker|oppsøkte|oppsøkt|seek out, visit
+overtale|overtaler|overtalte|overtalt|persuade
+parkere|parkerer|parkerte|parkert|park
+peke|peker|pekte|pekt|point
+reise|reiser|reiste|reist|travel
+reparere|reparerer|reparerte|reparert|repair
+repetere|repeterer|repeterte|repetert|repeat, revise
+representere|representerer|representerte|representert|represent
+ringe|ringer|ringte|ringt|ring, call (phone)
+rope|roper|ropte|ropt|shout, call
+røre|rører|rørte|rørt|stir; touch
+røyke|røyker|røykte/røyket|røykt/røyket|smoke
+sende|sender|sendte|sendt|send
+servere|serverer|serverte|servert|serve
+skinne|skinner|skinte|skint|shine
+skjønne|skjønner|skjønte|skjønt|understand
+skylde|skylder|skyldte|skyldt|owe; blame
+skylle|skyller|skylte|skylt|rinse
+skynde seg|skynder seg|skyndte seg|skyndt seg|hurry
+slenge|slenger|slengte|slengt|throw, fling
+smake|smaker|smakte|smakt|taste
+smelle|smeller|smalt/smelte|smelt|bang, slam
+smile|smiler|smilte|smilt|smile
+søke|søker|søkte|søkt|apply (for); search, seek
+spandere|spanderer|spanderte|spandert|treat (someone), pay for
+spare|sparer|sparte|spart|save
+spille|spiller|spilte|spilt|play (game, music)
+spise|spiser|spiste|spist|eat
+steke|steker|stekte|stekt|fry, roast
+stelle|steller|stelte|stelt|take care of, look after
+stemme|stemmer|stemte|stemt|vote; be correct; tune
+stenge|stenger|stengte|stengt|close, shut, block
+stille|stiller|stilte|stilt|put, place; ask (a question)
+studere|studerer|studerte|studert|study
+svare|svarer|svarte|svart|answer, reply
+svinge|svinger|svingte|svingt|turn, swing
+svømme|svømmer|svømte|svømt|swim
+tape|taper|tapte|tapt|lose (a game)
+tenke|tenker|tenkte|tenkt|think
+tenne|tenner|tente|tent|light, switch on
+tjene|tjener|tjente|tjent|earn
+torturere|torturerer|torturerte|torturert|torture
+trene|trener|trente|trent|train, work out
+trenge|trenger|trengte|trengt|need
+undersøke|undersøker|undersøkte|undersøkt|examine, investigate
+unnskylde|unnskylder|unnskyldte|unnskyldt|excuse
+utføre|utfører|utførte|utført|carry out, perform
+vise|viser|viste|vist|show
+vokse|vokser|vokste|vokst|grow, increase
+øke|øker|økte|økt|increase
+# de
+bygge|bygger|bygde|bygd|build
+dø|dør|døde|dødd|die
+eie|eier|eide|eid|own
+greie|greier|greide|greid|manage (to do)
+hogge|hogger|hogde|hogd|chop, cut
+leie|leier|leide|leid|rent
+leve|lever|levde|levd|live, be alive
+pleie|pleier|pleide|pleid|usually do, be used to; nurse
+prøve|prøver|prøvde|prøvd|try; try on
+veie|veier|veide|veid|weigh
+øve|øver|øvde|øvd|practise
+# dde
+bety|betyr|betydde/betød|betydd|mean, signify
+blø|blør|blødde|blødd|bleed
+bo|bor|bodde|bodd|live (reside)
+bry seg|bryr seg|brydde seg|brydd seg|care (about), bother
+gre|grer|gredde|gredd|comb
+kle|kler|kledde|kledd|dress; suit
+skje|skjer|skjedde|skjedd|happen
+skru|skrur|skrudde|skrudd|screw; turn (on/off)
+snø|snør|snødde|snødd|snow
+sy|syr|sydde|sydd|sew
+tro|tror|trodde|trodd|believe, think
+# sterk
+ansette|ansetter|ansatte|ansatt|hire, employ
+avbryte|avbryter|avbrøt|avbrutt|interrupt
+avslå|avslår|avslo|avslått|decline, refuse
+avstå|avstår|avsto/avstod|avstått|refrain from; give up
+be|ber|ba/bad|bedt|ask (for), pray
+beskrive|beskriver|beskrev|beskrevet|describe
+bestå|består|besto/bestod|bestått|pass (an exam); consist (of)
+bidra|bidrar|bidro|bidratt|contribute
+binde|binder|bandt|bundet|bind, tie
+bite|biter|bet/beit|bitt|bite
+bli|blir|ble|blitt|become; stay
+brekke|brekker|brakk|brukket|break
+brenne|brenner|brant|brent|burn (be on fire)
+brenne|brenner|brente|brent|burn (set fire to)
+bringe|bringer|brakte|brakt|bring
+bryte|bryter|brøt|brutt|break
+by|byr|bød|budt|offer; bid
+bære|bærer|bar|båret|carry
+delta|deltar|deltok|deltatt|participate, take part
+dette|detter|datt|dettet|fall (over)
+dra|drar|dro|dratt|go, leave; pull
+drikke|drikker|drakk|drukket|drink
+drive|driver|drev/dreiv|drevet|run (a business), do; drift
+ete|eter|åt|ett|eat (mostly animals)
+falle|faller|falt|falt|fall
+finne|finner|fant|funnet|find
+finnes|finnes|fantes|funnes|exist, be found
+fly|flyr|fløy|fløyet/flydd|fly
+flyte|flyter|fløt|flytt|float
+foreslå|foreslår|foreslo|foreslått|suggest, propose
+foretrekke|foretrekker|foretrakk|foretrukket|prefer
+forby|forbyr|forbød|forbudt|forbid, ban
+forlate|forlater|forlot|forlatt|leave, abandon
+forstå|forstår|forsto/forstod|forstått|understand
+forsvinne|forsvinner|forsvant|forsvunnet|disappear
+fortelle|forteller|fortalte|fortalt|tell
+fortsette|fortsetter|fortsatte|fortsatt|continue
+fryse|fryser|frøs|frosset/fryst|freeze, be cold
+følge|følger|fulgte|fulgt|follow
+fyke|fyker|føk|føket|drift, blow (snow, sand)
+få|får|fikk|fått|get, receive; be allowed to
+gi|gir|ga/gav|gitt|give
+gidde|gidder|gadd|giddet|bother to, can be bothered
+gjelde|gjelder|gjaldt|gjeldt|apply to, concern
+gjennomgå|gjennomgår|gjennomgikk|gjennomgått|review; go through
+gjenta|gjentar|gjentok|gjentatt|repeat
+gjøre|gjør|gjorde|gjort|do
+gli|glir|gled/glei|glidd|glide, slide, slip
+glippe|glipper|glapp|glippet|slip away, fail
+gni|gnir|gned/gnei|gnidd|rub
+grave|graver|grov/gravde|gravd|dig
+grine|griner|grein|grint|cry, whine
+gripe|griper|grep/greip|grepet|grab, seize, catch
+grue seg|gruer seg|grudde seg|grudd seg/gruet seg|dread
+gråte|gråter|gråt|grått|cry, weep
+gå|går|gikk|gått|go, walk, leave
+henge|henger|hang|hengt|hang (be hanging)
+hete|heter|het|hett|be called, be named
+hive|hiver|hev/hivde|hevet/hivd|heave, throw
+hjelpe|hjelper|hjalp|hjulpet|help
+holde|holder|holdt|holdt|hold; keep
+klype|klyper|kløp|kløpet|pinch
+knekke|knekker|knakk|knekt/knukket|crack, snap
+knipe|kniper|knep/kneip|knepet|pinch
+komme|kommer|kom|kommet|come
+krype|kryper|krøp|krøpet|crawl, creep
+la|lar|lot|latt|let, allow
+late som|later som|lot som|latt som|pretend
+le|ler|lo|ledd|laugh
+legge|legger|la|lagt|lay, put (down)
+lete|leter|lette|lett|look for, search
+lide|lider|led|lidd|suffer
+ligge|ligger|lå|ligget|lie, be lying
+lyve|lyver|løy|løyet|lie (tell a lie)
+løpe|løper|løp|løpt|run
+låte|låter|låt|lått|sound
+nyte|nyter|nøt|nytt|enjoy
+overdrive|overdriver|overdrev/overdreiv|overdrevet|exaggerate
+overskrive|overskriver|overskrev|overskrevet|overwrite
+overta|overtar|overtok|overtatt|take over
+pipe|piper|peip|pepet|chirp, beep
+pågripe|pågriper|pågrep|pågrepet|arrest
+rekke|rekker|rakk|rukket|reach; have time for; catch (a bus)
+rekke|rekker|rakte|rakt|hand, pass; stretch out
+renne|renner|rant|rent|run, flow
+ri|rir|red/reid|ridd|ride
+rive|river|rev/reiv|revet|tear, rip
+ryke|ryker|røk|røket|snap, break; smoke
+se|ser|så|sett|see, look
+selge|selger|solgte|solgt|sell
+sette|setter|satte|satt|set, put, place
+si|sier|sa|sagt|say, tell
+sitte|sitter|satt|sittet|sit
+skjelve|skjelver|skalv|skjelvet|tremble, shake
+skjære|skjærer|skar/skjærte|skåret/skjært|cut, slice
+skrike|skriker|skrek/skreik|skreket|scream, shout
+skrive|skriver|skrev/skreiv|skrevet|write
+skryte|skryter|skrøt|skrytt|brag, boast
+skyldes|skyldes|skyldtes|skyldtes|be due to, be caused by
+skyte|skyter|skjøt|skutt|shoot
+skyve|skyver|skjøv|skjøvet|push, slide
+slippe|slipper|slapp|sluppet|let go; avoid having to
+slite|sliter|slet/sleit|slitt|struggle; wear out
+slå|slår|slo|slått|hit, beat
+slåss|slåss|sloss|slåss|fight
+smøre|smører|smurte|smurt|spread (butter); lubricate
+snike|sniker|snek|sneket|sneak
+sove|sover|sov|sovet|sleep
+spinne|spinner|spant|spunnet|spin; purr
+sprekke|sprekker|sprakk|sprukket|burst, crack
+sprette|spretter|spratt|sprettet|bounce, leap
+springe|springer|sprang|sprunget|run, jump
+spørre|spør|spurte|spurt|ask
+stige|stiger|steg/steig|steget|rise, increase, climb
+stikke|stikker|stakk|stukket|sting, stab; leave, pop (out)
+stjele|stjeler|stjal|stjålet|steal
+strekke|strekker|strakk|strukket|stretch
+stryke|stryker|strøk|strøket|iron; stroke; fail (an exam); cross out
+stå|står|sto/stod|stått|stand
+svi|svir|sved/svei|svidd|sting, smart; singe
+svike|sviker|svek/sveik|sveket|betray, let down
+synes|synes/syns|syntes|synes/syns|think (have an opinion), seem
+synge|synger|sang|sunget|sing
+synke|synker|sank|sunket|sink
+ta|tar|tok|tatt|take
+telle|teller|talte/telte|talt/telt|count
+tigge|tigger|tagg/tigget|tigget|beg
+tilbringe|tilbringer|tilbrakte|tilbrakt|spend (time)
+tilby|tilbyr|tilbød|tilbudt|offer
+tillate|tillater|tillot|tillatt|allow, permit
+treffe|treffer|traff|truffet|meet; hit
+treffes|treffes|traffes|truffes|meet (each other)
+trekke|trekker|trakk|trukket|pull, draw
+trives|trives|trivdes|trivdes|thrive, be happy, feel at home
+tvinge|tvinger|tvang|tvunget|force
+tørre|tør|turte|turt|dare
+underskrive|underskriver|underskrev|underskrevet|sign
+unngå|unngår|unngikk|unngått|avoid
+velge|velger|valgte|valgt|choose; elect
+vinne|vinner|vant|vunnet|win
+vite|vet|visste|visst|know (a fact)
+voldta|voldtar|voldtok|voldtatt|rape
+vri|vrir|vred/vrei|vridd|twist
+ødelegge|ødelegger|ødela|ødelagt|destroy, ruin
+`;
+
+const VERB_GROUPS = {
+  aux:   ['Hjelpeverb', 'auxiliary'],
+  modal: ['Modalverb', 'modal'],
+  et:    ['Svake -et', 'regular: -et'],
+  te:    ['Svake -te', 'regular: -te'],
+  de:    ['Svake -de', 'regular: -de'],
+  dde:   ['Svake -dde', 'regular: -dde'],
+  sterk: ['Sterke / uregelrette', 'irregular'],
+};
+
+/* Vocabulary: Norwegian|English, grouped by topic. Nouns carry their article (en / ei / et). */
+const VOCAB_DATA = `
+# hilsen|Hilsener og fraser|Greetings & phrases
+hei|hi
+god morgen|good morning
+god dag|good day (formal hello)
+god kveld|good evening
+god natt|good night
+ha det (bra)|goodbye
+vi ses|see you
+takk|thanks
+tusen takk|thank you very much
+takk for sist|thanks for last time (said when you meet again)
+takk for maten|thanks for the meal
+vær så god|here you are; please (help yourself)
+ingen årsak|you're welcome, no problem
+unnskyld|excuse me; sorry
+beklager|I'm sorry
+ja|yes
+nei|no
+jo|yes (answer to a negative question)
+kanskje|maybe, perhaps
+selvfølgelig|of course
+hvordan har du det?|how are you?
+bare bra, takk|fine, thanks
+jeg heter …|my name is …
+hva heter du?|what is your name?
+hyggelig å treffe deg|nice to meet you
+i like måte|likewise
+velkommen|welcome
+gratulerer med dagen|happy birthday
+god tur|have a good trip
+lykke til|good luck
+god helg|have a nice weekend
+ha en fin dag|have a nice day
+jeg forstår ikke|I don't understand
+kan du gjenta?|can you repeat?
+kan du snakke saktere?|can you speak more slowly?
+hva betyr det?|what does that mean?
+jeg vet ikke|I don't know
+det går bra|it's fine, it's going well
+det gjør ingenting|it doesn't matter
+skål|cheers
+greit|okay, alright
+herlig|lovely, wonderful
+så synd|what a pity
+dessverre|unfortunately
+heldigvis|luckily, fortunately
+# sporsmal|Spørreord|Question words
+hva|what
+hvem|who
+hvor|where
+hvorfor|why
+hvordan|how
+når|when
+hvilken / hvilket / hvilke|which
+hvor mye|how much
+hvor mange|how many
+hvor lenge|how long
+hvor gammel|how old
+hvor ofte|how often
+hva slags|what kind of
+hvor kommer du fra?|where are you from?
+hva er klokka?|what time is it?
+# pronomen|Pronomen|Pronouns
+jeg|I
+meg|me
+du|you (one person)
+deg|you (object, one person)
+han|he
+ham|him
+hun|she
+henne|her
+den / det|it
+vi|we
+oss|us
+dere|you (plural)
+de|they
+dem|them
+min / mi / mitt / mine|my, mine
+din / di / ditt / dine|your, yours (one person)
+hans|his
+hennes|her, hers
+vår / vårt / våre|our, ours
+deres|your (plural); their
+sin / si / sitt / sine|his/her/their own
+seg|himself, herself, themselves
+man|one, you (people in general)
+noen|someone; some, any
+ingen|nobody; no, none
+alle|everyone, all
+alt|everything
+ingenting|nothing
+noe|something
+hver / hvert|each, every
+annen / annet / andre|other, another
+selv|self; even
+# tall|Tall|Numbers
+null|zero
+en / ett|one
+to|two
+tre|three
+fire|four
+fem|five
+seks|six
+sju / syv|seven
+åtte|eight
+ni|nine
+ti|ten
+elleve|eleven
+tolv|twelve
+tretten|thirteen
+fjorten|fourteen
+femten|fifteen
+seksten|sixteen
+sytten|seventeen
+atten|eighteen
+nitten|nineteen
+tjue|twenty
+tretti|thirty
+førti|forty
+femti|fifty
+seksti|sixty
+sytti|seventy
+åtti|eighty
+nitti|ninety
+hundre|hundred
+tusen|thousand
+en million|a million
+første|first
+andre|second
+tredje|third
+fjerde|fourth
+femte|fifth
+sjette|sixth
+sjuende|seventh
+åttende|eighth
+niende|ninth
+tiende|tenth
+halv|half
+en halvdel|a half
+et par|a couple, a pair
+# tid|Tid og kalender|Time & calendar
+mandag|Monday
+tirsdag|Tuesday
+onsdag|Wednesday
+torsdag|Thursday
+fredag|Friday
+lørdag|Saturday
+søndag|Sunday
+januar|January
+februar|February
+mars|March
+april|April
+mai|May
+juni|June
+juli|July
+august|August
+september|September
+oktober|October
+november|November
+desember|December
+en vår|a spring
+en sommer|a summer
+en høst|an autumn
+en vinter|a winter
+en dag|a day
+ei uke|a week
+en måned|a month
+et år|a year
+en time|an hour; an appointment
+et minutt|a minute
+et sekund|a second
+ei klokke|a clock, a watch
+en morgen|a morning
+en formiddag|a late morning
+en ettermiddag|an afternoon
+en kveld|an evening
+ei natt|a night
+ei helg|a weekend
+en ferie|a holiday, vacation
+en bursdag|a birthday
+en høytid|a (religious) holiday, festival
+i dag|today
+i går|yesterday
+i morgen|tomorrow
+i forgårs|the day before yesterday
+i overmorgen|the day after tomorrow
+nå|now
+snart|soon
+senere|later
+tidlig|early
+sent|late
+alltid|always
+aldri|never
+ofte|often
+noen ganger|sometimes
+sjelden|rarely
+vanligvis|usually
+hver dag|every day
+for … siden|… ago
+kvart over|quarter past
+kvart på|quarter to
+halv tre|half past two (2:30)
+# familie|Familie og mennesker|Family & people
+en familie|a family
+ei mor|a mother
+en far|a father
+foreldre|parents
+et barn|a child
+en sønn|a son
+ei datter|a daughter
+en bror|a brother
+ei søster|a sister
+søsken|siblings
+ei bestemor|a grandmother
+en bestefar|a grandfather
+et barnebarn|a grandchild
+en onkel|an uncle
+ei tante|an aunt
+en fetter|a (male) cousin
+ei kusine|a (female) cousin
+en nevø|a nephew
+ei niese|a niece
+en mann|a man; a husband
+ei kone|a wife
+en ektefelle|a spouse
+en samboer|a partner (living together, unmarried)
+en kjæreste|a boyfriend, girlfriend
+en venn|a friend
+ei venninne|a (female) friend
+en nabo|a neighbour
+en baby|a baby
+en gutt|a boy
+ei jente|a girl
+ei kvinne|a woman
+et menneske|a human being
+en person|a person
+voksen|adult, grown-up
+gift|married
+skilt|divorced
+enslig|single, living alone
+ei svigermor|a mother-in-law
+en svigerfar|a father-in-law
+# kropp|Kropp og helse|Body & health
+et hode|a head
+et hår|a hair
+et ansikt|a face
+et øye|an eye (pl. øyne)
+et øre|an ear
+ei nese|a nose
+en munn|a mouth
+en tann|a tooth (pl. tenner)
+en hals|a throat, neck
+en nakke|a (back of the) neck
+en skulder|a shoulder
+en arm|an arm
+ei hånd|a hand
+en finger|a finger
+en rygg|a back
+et bryst|a chest, breast
+en mage|a stomach, belly
+et bein|a leg; a bone
+et kne|a knee
+en fot|a foot (pl. føtter)
+et hjerte|a heart
+et blod|blood
+syk|sick, ill
+frisk|healthy, well
+ha vondt i …|have a pain in …, … hurts
+en smerte|a pain
+en feber|a fever
+en forkjølelse|a cold
+en lege|a doctor
+en fastlege|a GP (your regular doctor)
+en sykepleier|a nurse
+et sykehus|a hospital
+et legekontor|a doctor's office
+ei legevakt|an emergency clinic (out of hours)
+en tannlege|a dentist
+et apotek|a pharmacy
+en medisin|a medicine
+en resept|a prescription
+sykemeldt|on sick leave
+gravid|pregnant
+en skade|an injury; damage
+# hjem|Hjemmet|Home
+et hjem|a home
+et hus|a house
+en leilighet|an apartment, flat
+et rom|a room
+et soverom|a bedroom
+ei stue|a living room
+et kjøkken|a kitchen
+et bad|a bathroom
+et toalett / en do|a toilet
+en gang|a hallway; a time (once)
+en kjeller|a basement
+et loft|an attic
+en balkong|a balcony
+en hage|a garden
+ei dør|a door
+et vindu|a window
+en vegg|a wall
+et gulv|a floor
+et tak|a roof; a ceiling
+ei trapp|a staircase
+en heis|a lift, elevator
+ei seng|a bed
+et bord|a table
+en stol|a chair
+en sofa|a sofa
+et skap|a cupboard, wardrobe
+ei hylle|a shelf
+en lampe|a lamp
+et teppe|a rug; a blanket
+et kjøleskap|a fridge
+en komfyr|a stove, cooker
+en ovn|an oven; a heater
+en oppvaskmaskin|a dishwasher
+en vaskemaskin|a washing machine
+en nøkkel|a key
+ei dyne|a duvet
+ei pute|a pillow, cushion
+et speil|a mirror
+et håndkle|a towel
+en husleie|rent
+en utleier|a landlord
+# mat|Mat og drikke|Food & drink
+en mat|food
+en frokost|a breakfast
+en lunsj|a lunch
+en middag|a dinner (main hot meal)
+en kveldsmat|an evening snack, supper
+et brød|a loaf, bread
+ei brødskive|a slice of bread
+et smør|butter
+en ost|cheese
+en brunost|brown (whey) cheese
+et egg|an egg
+ei melk|milk
+et vann|water; a lake
+en kaffe|coffee
+en te|tea
+en juice|juice
+et øl|beer
+en vin|wine
+et sukker|sugar
+et salt|salt
+en pepper|pepper
+et kjøtt|meat
+en fisk|a fish
+en kylling|a chicken
+en laks|a salmon
+ei pølse|a sausage
+en skinke|ham
+en potet|a potato
+en ris|rice
+en pasta|pasta
+en grønnsak|a vegetable
+en gulrot|a carrot
+en løk|an onion
+en tomat|a tomato
+en agurk|a cucumber
+en salat|a salad; lettuce
+en frukt|a fruit
+et eple|an apple
+en banan|a banana
+en appelsin|an orange
+ei pære|a pear; a light bulb
+et bær|a berry
+et jordbær|a strawberry
+ei kake|a cake
+en sjokolade|chocolate
+en is|ice cream; ice
+ei suppe|a soup
+en tallerken|a plate
+et glass|a glass
+en kopp|a cup
+en kniv|a knife
+en gaffel|a fork
+ei skje|a spoon
+sulten|hungry
+tørst|thirsty
+mett|full (after eating)
+god / godt|good, tasty
+søt|sweet; cute
+sur|sour; grumpy
+en butikk|a shop
+en restaurant|a restaurant
+ei regning|a bill
+en meny|a menu
+# klaer|Klær|Clothes
+klær|clothes
+ei jakke|a jacket
+en genser|a sweater, jumper
+ei skjorte|a shirt
+ei t-skjorte|a T-shirt
+ei bukse|a pair of trousers
+et skjørt|a skirt
+en kjole|a dress
+en dress|a suit
+en sko|a shoe
+en støvel|a boot
+en sokk|a sock
+ei lue|a knitted hat, beanie
+et skjerf|a scarf
+en vott|a mitten
+en hanske|a glove
+et belte|a belt
+ei lomme|a pocket
+ei veske|a bag, handbag
+en sekk|a backpack; a sack
+en paraply|an umbrella
+et regntøy|rain gear
+en størrelse|a size
+# by|Byen og steder|Town & places
+en by|a town, city
+ei bygd|a rural community, village
+et land|a country
+ei gate|a street
+en vei|a road, way
+et torg|a square, marketplace
+et sentrum|a town centre
+et kjøpesenter|a shopping centre
+en bank|a bank
+et postkontor|a post office
+et bibliotek|a library
+en skole|a school
+en barnehage|a kindergarten
+et universitet|a university
+ei kirke|a church
+en moské|a mosque
+et museum|a museum
+en kino|a cinema
+et teater|a theatre
+en park|a park
+en stasjon|a station
+en flyplass|an airport
+et hotell|a hotel
+et rådhus|a town hall
+en kommune|a municipality
+et NAV-kontor|a welfare office (NAV)
+et treningssenter|a gym
+en svømmehall|a swimming pool
+et kart|a map
+et hjørne|a corner
+et lyskryss|traffic lights (junction)
+et fortau|a pavement, sidewalk
+en adresse|an address
+til høyre|to the right
+til venstre|to the left
+rett fram|straight ahead
+i nærheten|nearby
+langt unna|far away
+# transport|Transport og reise|Transport & travel
+en bil|a car
+en buss|a bus
+et tog|a train
+en trikk|a tram
+en T-bane|a metro, underground
+et fly|a plane
+en båt|a boat
+ei ferje|a ferry
+en sykkel|a bicycle
+en drosje / taxi|a taxi
+en billett|a ticket
+en sjåfør|a driver
+et førerkort|a driving licence
+en reise|a journey, trip
+en tur|a trip, outing; a walk
+et pass|a passport
+en koffert|a suitcase
+en avgang|a departure
+en ankomst|an arrival
+en holdeplass|a (bus/tram) stop
+forsinket|delayed
+en kø|a queue
+# arbeid|Arbeid og skole|Work & school
+en jobb|a job
+et arbeid|work, labour
+en arbeidsgiver|an employer
+en arbeidstaker|an employee
+en sjef|a boss
+en kollega|a colleague
+en lønn|a salary, wage
+en søknad|an application
+en CV|a CV, résumé
+et jobbintervju|a job interview
+en stilling|a position, post
+deltid|part-time
+heltid|full-time
+fast jobb|a permanent job
+arbeidsledig|unemployed
+en pensjon|a pension
+et møte|a meeting
+en avtale|an agreement; an appointment
+en oppgave|a task, assignment
+en utdanning|an education
+et kurs|a course
+en lærer|a teacher
+en elev|a pupil
+en student|a student
+en klasse|a class
+ei lekse|homework
+en eksamen|an exam
+en prøve|a test
+en karakter|a grade, mark
+et fag|a subject
+ei bok|a book
+en blyant|a pencil
+en penn|a pen
+et papir|paper
+en datamaskin|a computer
+en mobil|a mobile phone
+en e-post|an e-mail
+et yrke|a profession, occupation
+en erfaring|an experience
+en kunde|a customer
+en bedrift|a company, business
+en fagforening|a trade union
+en overtid|overtime
+# natur|Natur og vær|Nature & weather
+et vær|weather
+ei sol|sun
+et regn|rain
+en snø|snow
+en vind|wind
+ei sky|a cloud
+en tåke|fog
+kaldt|cold
+varmt|warm, hot
+kjølig|cool, chilly
+mildt|mild
+en grad|a degree
+et fjell|a mountain
+en fjord|a fjord
+en innsjø|a lake
+en sjø|a sea; a lake
+et hav|an ocean
+ei elv|a river
+en skog|a forest
+et tre|a tree; wood
+en blomst|a flower
+et gress|grass
+ei strand|a beach
+ei øy|an island
+en dal|a valley
+en isbre|a glacier
+et nordlys|northern lights
+ei midnattssol|midnight sun
+en stein|a stone
+en himmel|a sky; heaven
+ei stjerne|a star
+en måne|a moon
+ei jord|earth, soil
+ei luft|air
+# dyr|Dyr|Animals
+en hund|a dog
+ei katt|a cat
+en hest|a horse
+ei ku|a cow
+en gris|a pig
+en sau|a sheep
+ei geit|a goat
+en fugl|a bird
+en elg|a moose
+et reinsdyr|a reindeer
+en bjørn|a bear
+en ulv|a wolf
+ei mus|a mouse
+# farger|Farger|Colours
+en farge|a colour
+rød|red
+blå|blue
+grønn|green
+gul|yellow
+svart|black
+hvit|white
+grå|grey
+brun|brown
+rosa|pink
+lilla|purple
+oransje|orange
+lys|light (colour); bright
+mørk|dark
+# adjektiv|Adjektiver|Adjectives
+stor|big, large
+liten|small, little
+lang|long
+kort|short
+høy|tall, high; loud
+lav|low; short (person)
+gammel|old
+ung|young
+ny|new
+god|good
+dårlig|bad, poor; ill
+bra|good, fine
+fin|nice, fine
+pen|pretty
+stygg|ugly
+rik|rich
+fattig|poor
+billig|cheap
+dyr|expensive
+lett|easy; light (weight)
+tung|heavy
+vanskelig|difficult
+enkel|simple
+varm|warm, hot
+kald|cold
+rask|fast, quick
+langsom|slow
+glad|happy, glad
+trist|sad
+lei seg|sad, upset; sorry
+sint|angry
+redd|afraid, scared
+sliten|tired, worn out
+trøtt|sleepy, tired
+fornøyd|satisfied, pleased
+nervøs|nervous
+stolt|proud
+flink|clever, skilled, good at
+snill|kind
+hyggelig|nice, pleasant
+morsom|funny, fun
+kjedelig|boring
+interessant|interesting
+viktig|important
+vanlig|common, usual, ordinary
+riktig|right, correct
+feil|wrong; a mistake
+sann|true
+ferdig|finished, done
+opptatt|busy; occupied
+ledig|free, vacant, available
+gratis|free (of charge)
+åpen|open
+stengt|closed
+full|full; drunk
+tom|empty
+ren|clean
+skitten|dirty
+våt|wet
+tørr|dry
+sterk|strong
+svak|weak
+tykk|thick; fat
+tynn|thin
+bred|wide
+smal|narrow
+sikker|sure, certain; safe
+trygg|safe, secure
+farlig|dangerous
+stille|quiet, calm
+bråkete|noisy
+mulig|possible
+umulig|impossible
+nødvendig|necessary
+lik|alike, similar
+forskjellig|different
+egen / eget / egne|own
+hel|whole
+alene|alone
+# smaord|Småord|Small words: links & adverbs
+og|and
+eller|or
+men|but
+for|because (formal); for
+fordi|because
+at|that
+hvis|if
+om|if, whether; about
+da|when (once, past); then
+som|who, which, that; as
+så|so; then
+selv om|although, even if
+mens|while
+før|before
+etter at|after
+både … og|both … and
+enten … eller|either … or
+verken … eller|neither … nor
+også|also, too
+bare|only, just
+ikke|not
+veldig|very
+ganske|quite, rather
+litt|a little
+mye|much, a lot
+mange|many
+mer|more
+mest|most
+mindre|less, smaller
+nok|enough; probably
+altfor|far too
+allerede|already
+fortsatt|still
+ennå|yet, still
+igjen|again; left (over)
+sammen|together
+her|here
+der|there
+hjemme|at home
+hjem|home (direction)
+ute|outside (location)
+ut|out (direction)
+inne|inside (location)
+inn|in (direction)
+oppe|up (location)
+opp|up (direction)
+nede|down (location)
+ned|down (direction)
+borte|away, gone
+først|first
+sist|last
+plutselig|suddenly
+egentlig|actually, really
+faktisk|in fact, actually
+sikkert|surely, probably
+nesten|almost
+akkurat|exactly; just now
+helt|completely
+ellers|otherwise; else
+derfor|therefore, that's why
+likevel|anyway, nevertheless
+i hvert fall|at least, anyway
+omtrent|about, approximately
+# preposisjon|Preposisjoner|Prepositions
+i|in
+på|on; at
+til|to
+fra|from
+med|with
+uten|without
+av|of; by; off
+hos|at (someone's place)
+mellom|between
+over|over, above
+under|under, below
+foran|in front of
+bak|behind
+ved|by, next to
+ved siden av|beside, next to
+rundt|around
+gjennom|through
+mot|towards; against
+langs|along
+etter|after
+siden|since
+innen|by, within (a time)
+blant|among
+# samfunn|Samfunn og hverdag|Society & everyday life
+et samfunn|a society
+en innbygger|an inhabitant, resident
+et statsborgerskap|a citizenship
+en statsborger|a citizen
+et valg|an election; a choice
+en regjering|a government
+et storting|a parliament (Stortinget)
+en statsminister|a prime minister
+en konge|a king
+et parti|a (political) party
+ei lov|a law
+en rettighet|a right
+en plikt|a duty
+et demokrati|a democracy
+en domstol|a court of law
+et politi|police
+en skatt|a tax
+et fylke|a county
+ei likestilling|equality (esp. gender)
+ei ytringsfrihet|freedom of speech
+en religion|a religion
+en kultur|a culture
+et språk|a language
+en innvandrer|an immigrant
+en flyktning|a refugee
+en oppholdstillatelse|a residence permit
+et personnummer|a national ID number
+frivillig|voluntary
+en dugnad|a voluntary community work day
+en tradisjon|a tradition
+ei trygd|a social security benefit
+en forsikring|insurance
+penger|money
+en krone|a krone (Norwegian currency)
+et bankkort|a bank card
+kontanter|cash
+en pris|a price; a prize
+et tilbud|an offer; a sale
+en kvittering|a receipt
+en pose|a (plastic/paper) bag
+`;
+
+/* ---------------- BUILD ITEMS ---------------- */
+const ITEMS = [];
+const CATS = {verb: [], word: []};
+(function build(){
+  let grp = null;
+  VERB_DATA.trim().split('\n').forEach(line => {
+    line = line.trim(); if (!line) return;
+    if (line.startsWith('#')) { grp = line.slice(1).trim(); return; }
+    const [inf, pres, pret, perf, en] = line.split('|');
+    ITEMS.push({id: 'v:' + inf + ':' + pret, kind: 'verb', cat: grp, no: 'å ' + inf, en, inf, pres, pret, perf});
+  });
+  Object.keys(VERB_GROUPS).forEach(k => CATS.verb.push({key: k, no: VERB_GROUPS[k][0], en: VERB_GROUPS[k][1]}));
+  let cat = null;
+  VOCAB_DATA.trim().split('\n').forEach(line => {
+    line = line.trim(); if (!line) return;
+    if (line.startsWith('#')) { const [k, no, en] = line.slice(1).trim().split('|'); cat = k; CATS.word.push({key: k, no, en}); return; }
+    const [no, en] = line.split('|');
+    ITEMS.push({id: 'w:' + cat + ':' + no, kind: 'word', cat, no, en});
+  });
+})();
+const CAT_INDEX = {};
+[...CATS.verb, ...CATS.word].forEach(c => CAT_INDEX[c.key] = c);
+
+/* ---------------- STORAGE ---------------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+let progress = store.get('nt-progress', {});
+const saved = store.get('nt-state', {});
+const state = {
+  deck: saved.deck || 'verb',
+  cats: new Set(saved.cats || []),
+  onlyNew: !!saved.onlyNew,
+  mode: saved.mode || 'cards',
+  dir: saved.dir || 'no-en',
+};
+function saveState() { store.set('nt-state', {deck: state.deck, cats: [...state.cats], onlyNew: state.onlyNew, mode: state.mode, dir: state.dir}); }
+const box = it => progress[it.id] || 0;
+const LEARNED = 3;
+function mark(it, ok) {
+  const b = box(it);
+  progress[it.id] = ok ? Math.min(5, b + 1) : 0;
+  store.set('nt-progress', progress);
+  updateStats();
+}
+
+/* ---------------- HELPERS ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function pickWeighted(list, avoid) {
+  const cand = list.length > 1 && avoid ? list.filter(x => x !== avoid) : list;
+  const w = cand.map(it => Math.pow(6 - box(it), 2));
+  let r = Math.random() * w.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < cand.length; i++) { r -= w[i]; if (r <= 0) return cand[i]; }
+  return cand[cand.length - 1];
+}
+function pool() {
+  return ITEMS.filter(it => {
+    if (state.deck !== 'all' && it.kind !== state.deck) return false;
+    if (state.deck !== 'all' && state.cats.size && !state.cats.has(it.cat)) return false;
+    if (state.onlyNew && box(it) >= LEARNED) return false;
+    return true;
+  });
+}
+function catLabel(it) {
+  const c = CAT_INDEX[it.cat];
+  return it.kind === 'verb' ? 'verb · ' + c.en : c.en;
+}
+/* Answer checking: accept any "/"-alternative, optional parts in (), and ignore å / har / en / ei / et. */
+function expand(s) {
+  let out = [''];
+  const re = /\(([^)]*)\)/g; let last = 0, m;
+  const parts = [];
+  while ((m = re.exec(s))) { parts.push([s.slice(last, m.index), m[1]]); last = re.lastIndex; }
+  const tail = s.slice(last);
+  parts.forEach(([pre, opt]) => { out = out.flatMap(o => [o + pre, o + pre + opt]); });
+  return out.map(o => o + tail);
+}
+function norm(s) {
+  return s.toLowerCase().replace(/…/g, '').replace(/[.,!?;:"]/g, ' ')
+    .replace(/\s+/g, ' ').trim()
+    .replace(/^(å|har|en|ei|et) /, '').replace(/\s+/g, ' ').trim();
+}
+function variants(ans) {
+  return ans.split('/').flatMap(a => expand(a.trim())).map(norm).filter(Boolean);
+}
+function isRight(input, ans) {
+  const n = norm(input);
+  if (!n) return false;
+  return variants(ans).includes(n);
+}
+
+/* ---------------- SPEECH ---------------- */
+let noVoice = null;
+function findVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const vs = speechSynthesis.getVoices();
+  noVoice = vs.find(v => /^(nb|no|nn)/i.test(v.lang)) || null;
+}
+try { findVoice(); speechSynthesis.onvoiceschanged = () => { findVoice(); if (noVoice) render(); }; } catch (e) {}
+function speak(text) {
+  if (!noVoice) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/…/g, '').replace(/\s\/\s/g, ', '));
+    u.voice = noVoice; u.lang = noVoice.lang; u.rate = .9;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const SPEAK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+function speakBtn(text) { return noVoice ? `<button class="speak" data-say="${esc(text)}" aria-label="Lytt / Listen">${SPEAK_ICON}</button>` : ''; }
+document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) { e.stopPropagation(); speak(b.dataset.say); } });
+
+/* ---------------- DECK UI ---------------- */
+function renderDeck() {
+  document.querySelectorAll('[data-deck]').forEach(b => b.setAttribute('aria-pressed', b.dataset.deck === state.deck));
+  $('#onlyNew').checked = state.onlyNew;
+  const chips = $('#chips');
+  if (state.deck === 'all') { chips.innerHTML = '<span class="hint">Alle verb og alle ord blandet. All verbs and words mixed.</span>'; }
+  else {
+    const list = CATS[state.deck];
+    const count = k => ITEMS.filter(i => i.cat === k && i.kind === state.deck).length;
+    chips.innerHTML = `<button class="chip" data-cat="" aria-pressed="${state.cats.size === 0}">Alle</button>` +
+      list.map(c => `<button class="chip" data-cat="${c.key}" aria-pressed="${state.cats.has(c.key)}" title="${esc(c.en)}">${esc(c.no)} <small>${count(c.key)}</small></button>`).join('');
+  }
+  const p = pool();
+  const base = ITEMS.filter(it => (state.deck === 'all' || it.kind === state.deck) && (state.deck === 'all' || !state.cats.size || state.cats.has(it.cat)));
+  const learned = base.filter(it => box(it) >= LEARNED).length;
+  $('#poolInfo').textContent = `${p.length} ord i øvelsen · ${learned} av ${base.length} lært`;
+  $('#poolBar').style.width = (base.length ? learned / base.length * 100 : 0) + '%';
+  document.querySelectorAll('[data-mode]').forEach(b => {
+    b.setAttribute('aria-pressed', b.dataset.mode === state.mode);
+  });
+}
+function updateStats() {
+  $('#stLearned').textContent = ITEMS.filter(it => box(it) >= LEARNED).length;
+  $('#stTotal').textContent = ITEMS.length;
+}
+document.querySelectorAll('[data-deck]').forEach(b => b.addEventListener('click', () => {
+  state.deck = b.dataset.deck; state.cats.clear(); saveState(); resetSession(); renderDeck(); render();
+}));
+$('#chips').addEventListener('click', e => {
+  const c = e.target.closest('[data-cat]'); if (!c) return;
+  const k = c.dataset.cat;
+  if (!k) state.cats.clear(); else if (state.cats.has(k)) state.cats.delete(k); else state.cats.add(k);
+  saveState(); resetSession(); renderDeck(); render();
+});
+$('#onlyNew').addEventListener('change', e => { state.onlyNew = e.target.checked; saveState(); resetSession(); renderDeck(); render(); });
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+  state.mode = b.dataset.mode; saveState(); resetSession(); renderDeck(); render();
+}));
+function restoreReset() {
+  $('#resetWrap').innerHTML = '<button class="linkbtn" id="resetBtn">Nullstill fremgang</button>';
+  bindReset();
+}
+function bindReset() {
+  $('#resetBtn').onclick = () => {
+    const w = $('#resetWrap');
+    w.innerHTML = 'Sikker? <button class="linkbtn" id="rsYes">Ja, slett alt</button> <button class="linkbtn" id="rsNo">Avbryt</button>';
+    $('#rsYes').onclick = () => { progress = {}; store.set('nt-progress', progress); restoreReset(); updateStats(); resetSession(); renderDeck(); render(); };
+    $('#rsNo').onclick = restoreReset;
+  };
+}
+
+/* ---------------- SESSION ---------------- */
+let S = {};
+function resetSession() { S = {}; }
+const stage = $('#stage');
+
+function dirSeg() {
+  return `<div class="seg dir" role="group" aria-label="Retning">
+    <button data-dir="no-en" aria-pressed="${state.dir === 'no-en'}">Norsk → English</button>
+    <button data-dir="en-no" aria-pressed="${state.dir === 'en-no'}">English → Norsk</button></div>`;
+}
+stage.addEventListener('click', e => {
+  const d = e.target.closest('[data-dir]');
+  if (d) { state.dir = d.dataset.dir; saveState(); resetSession(); render(); }
+});
+function boxes(it) { const b = box(it); return `<div class="boxes" title="Nivå ${b} av 5">${[1,2,3,4,5].map(i => `<i class="${i <= b ? 'on' : ''}"></i>`).join('')}</div>`; }
+function formsHTML(it) {
+  return `<div class="forms">
+    <div><em>Presens</em><code>${esc(it.pres)}</code></div>
+    <div><em>Preteritum</em><code>${esc(it.pret)}</code></div>
+    <div><em>Perfektum</em><code>har ${esc(it.perf)}</code></div></div>`;
+}
+function emptyMsg(msg) {
+  stage.innerHTML = `<div class="empty"><h2 style="font-size:1.4rem">Ingen ord her</h2><p>${msg || 'Velg en annen kategori, eller slå av «Bare ord jeg ikke kan ennå». Pick another category or turn off the “only new words” filter.'}</p></div>`;
+}
+
+/* ---- Flashcards ---- */
+function renderCards() {
+  const p = pool();
+  if (!p.length) return emptyMsg();
+  if (!S.queue) {
+    S.queue = shuffle(p).sort((a, b) => box(a) - box(b));
+    S.i = 0; S.known = 0; S.again = 0; S.flipped = false;
+  }
+  if (S.i >= S.queue.length) {
+    stage.innerHTML = `<div class="empty"><h2 style="font-size:1.6rem">Bra jobba!</h2>
+      <p>Du gikk gjennom ${S.queue.length} kort. ${S.known} kunne du, ${S.again} måtte du øve på igjen.</p>
+      <div class="actions"><button class="btn primary" id="again">Ny runde</button></div></div>`;
+    $('#again').onclick = () => { resetSession(); render(); };
+    return;
+  }
+  const it = S.queue[S.i];
+  const noSide = `<span class="tag">${esc(catLabel(it))}</span>
+      <div class="big">${esc(it.no)}</div>${speakBtn(it.no)}`;
+  const enSide = `<span class="tag">${esc(catLabel(it))}</span><div class="mid">${esc(it.en)}</div>`;
+  const backExtra = it.kind === 'verb' ? formsHTML(it) : '';
+  const front = state.dir === 'no-en' ? noSide : enSide;
+  const back = state.dir === 'no-en'
+    ? `<div class="big" style="font-size:1.3rem">${esc(it.no)}</div><div class="mid">${esc(it.en)}</div>${backExtra}`
+    : `<div class="mid">${esc(it.en)}</div><div class="big">${esc(it.no)}</div>${speakBtn(it.no)}${backExtra}`;
+  stage.innerHTML = `
+    <div class="stage-top">${dirSeg()}<span class="count">${S.i + 1} / ${S.queue.length}</span></div>
+    <div class="card-scene"><div class="card ${S.flipped ? 'flipped' : ''}" id="card" role="button" tabindex="0" aria-label="Snu kortet / flip card">
+      <div class="face front">${front}<span class="hint">Trykk for å snu · tap or press Space</span></div>
+      <div class="face back">${back}${boxes(it)}</div>
+    </div></div>
+    <div class="actions">
+      <button class="btn bad" id="cAgain">Øv igjen<kbd>1</kbd></button>
+      <button class="btn good" id="cKnow">Jeg kan den<kbd>2</kbd></button>
+    </div>`;
+  const card = $('#card');
+  card.onclick = () => { S.flipped = !S.flipped; card.classList.toggle('flipped', S.flipped); };
+  $('#cAgain').onclick = () => cardAnswer(false);
+  $('#cKnow').onclick = () => cardAnswer(true);
+}
+function cardAnswer(ok) {
+  const it = S.queue[S.i];
+  mark(it, ok);
+  if (ok) S.known++; else { S.again++; S.queue.splice(Math.min(S.queue.length, S.i + 4), 0, it); }
+  S.i++; S.flipped = false;
+  renderDeck(); renderCards();
+}
+
+/* ---- Quiz ---- */
+function renderQuiz() {
+  const p = pool();
+  const all = ITEMS.filter(it => state.deck === 'all' || it.kind === state.deck);
+  if (!p.length) return emptyMsg();
+  if (!S.q) newQuiz(p, all);
+  const {it, opts, answered, pick} = S.q;
+  const ask = state.dir === 'no-en' ? it.no : it.en;
+  const val = o => state.dir === 'no-en' ? o.en : o.no;
+  S.score = S.score || {right: 0, total: 0, streak: 0};
+  stage.innerHTML = `
+    <div class="stage-top">${dirSeg()}<span class="count">${S.score.right} / ${S.score.total} riktige · rekke ${S.score.streak}</span></div>
+    <div class="prompt"><span class="tag">${esc(catLabel(it))}</span>
+      <div class="${state.dir === 'no-en' ? 'big' : 'mid'}">${esc(ask)}</div>${state.dir === 'no-en' ? speakBtn(it.no) : ''}
+      <span class="hint">${state.dir === 'no-en' ? 'Hva betyr dette på engelsk?' : 'Hva heter dette på norsk?'}</span></div>
+    <div class="opts">${opts.map((o, i) => {
+      let cls = '';
+      if (answered) { if (o === it) cls = 'right'; else if (o === pick) cls = 'wrong'; }
+      return `<button class="opt ${cls}" data-i="${i}" ${answered ? 'disabled' : ''}><kbd>${i + 1}</kbd><span>${esc(val(o))}</span></button>`;
+    }).join('')}</div>
+    <div class="feedback ${answered ? (pick === it ? 'ok' : 'no') : ''}">${answered ? (pick === it ? 'Riktig!' : 'Feil. Riktig svar: ' + esc(val(it))) : ''}</div>
+    ${answered && it.kind === 'verb' ? `<div style="display:flex;justify-content:center">${formsHTML(it)}</div>` : ''}
+    <div class="actions">${answered ? '<button class="btn primary" id="qNext">Neste<kbd>Enter</kbd></button>' : ''}</div>`;
+  stage.querySelectorAll('.opt').forEach(b => b.onclick = () => quizPick(+b.dataset.i));
+  if (answered) $('#qNext').onclick = () => { S.q = null; renderQuiz(); };
+}
+function newQuiz(p, all) {
+  const it = pickWeighted(p, S.last);
+  S.last = it;
+  const key = o => (state.dir === 'no-en' ? o.en : o.no).toLowerCase();
+  let src = all.filter(o => o.cat === it.cat && o !== it);
+  if (src.length < 6) src = all.filter(o => o !== it);
+  const seen = new Set([key(it)]); const dist = [];
+  for (const o of shuffle(src)) { if (!seen.has(key(o))) { seen.add(key(o)); dist.push(o); } if (dist.length === 3) break; }
+  S.q = {it, opts: shuffle([it, ...dist]), answered: false, pick: null};
+}
+function quizPick(i) {
+  const q = S.q; if (q.answered) return;
+  q.answered = true; q.pick = q.opts[i];
+  const ok = q.pick === q.it;
+  S.score.total++; if (ok) { S.score.right++; S.score.streak++; } else S.score.streak = 0;
+  mark(q.it, ok); renderDeck(); renderQuiz();
+}
+
+/* ---- Match ---- */
+function renderMatch() {
+  const p = pool();
+  if (p.length < 2) return emptyMsg('Du trenger minst to ord for å spille Par. Choose a bigger selection.');
+  if (!S.m) {
+    const chosen = []; const seenNo = new Set(), seenEn = new Set();
+    for (const it of shuffle(p).sort((a, b) => box(a) - box(b) + (Math.random() - .5) * 2)) {
+      if (seenNo.has(it.no) || seenEn.has(it.en)) continue;
+      seenNo.add(it.no); seenEn.add(it.en); chosen.push(it);
+      if (chosen.length === 6) break;
+    }
+    S.m = {items: chosen, left: shuffle(chosen), right: shuffle(chosen), done: new Set(), miss: new Set(), sel: null, errors: 0, start: Date.now()};
+    S.rounds = S.rounds || 0;
+  }
+  const m = S.m;
+  const finished = m.done.size === m.items.length;
+  const secs = Math.round(((finished ? m.end : Date.now()) - m.start) / 1000);
+  stage.innerHTML = `
+    <div class="stage-top"><span class="label">Finn parene · match Norwegian to English</span><span class="count">${m.done.size} / ${m.items.length} · ${m.errors} feil</span></div>
+    ${finished ? `<div class="empty"><h2 style="font-size:1.6rem">Ferdig på ${secs} sekunder</h2><p>${m.errors === 0 ? 'Ingen feil. Perfekt!' : m.errors + ' feil denne runden.'}</p>
+      <div class="actions"><button class="btn primary" id="mNext">Ny runde<kbd>Enter</kbd></button></div></div>` : `
+    <div class="match">
+      <div class="col">${m.left.map(it => `<button class="tile no ${m.done.has(it) ? 'done' : ''} ${m.sel && m.sel.side === 'L' && m.sel.it === it ? 'sel' : ''}" data-side="L" data-id="${esc(it.id)}" ${m.done.has(it) ? 'disabled' : ''}>${esc(it.no)}</button>`).join('')}</div>
+      <div class="col">${m.right.map(it => `<button class="tile ${m.done.has(it) ? 'done' : ''} ${m.sel && m.sel.side === 'R' && m.sel.it === it ? 'sel' : ''}" data-side="R" data-id="${esc(it.id)}" ${m.done.has(it) ? 'disabled' : ''}>${esc(it.en)}</button>`).join('')}</div>
+    </div>`}`;
+  if (finished) { $('#mNext').onclick = () => { S.m = null; renderMatch(); }; return; }
+  stage.querySelectorAll('.tile').forEach(t => t.onclick = () => matchClick(t));
+}
+function matchClick(t) {
+  const m = S.m;
+  const it = m.items.find(x => x.id === t.dataset.id);
+  const side = t.dataset.side;
+  if (!m.sel || m.sel.side === side) { m.sel = {side, it}; if (side === 'L') speak(it.no); renderMatch(); return; }
+  if (m.sel.it === it) {
+    m.done.add(it); mark(it, !m.miss.has(it)); m.sel = null;
+    if (m.done.size === m.items.length) m.end = Date.now();
+    renderDeck(); renderMatch();
+  } else {
+    m.errors++; m.miss.add(m.sel.it); m.miss.add(it);
+    const other = stage.querySelector('.tile.sel');
+    t.classList.add('err'); if (other) other.classList.add('err');
+    m.sel = null;
+    setTimeout(renderMatch, 450);
+  }
+}
+
+/* ---- Write ---- */
+let lastInput = null;
+document.addEventListener('focusin', e => { if (e.target.matches('.inwrap input')) lastInput = e.target; });
+function keysHTML() { return `<div class="keys">${['æ', 'ø', 'å'].map(k => `<button type="button" data-key="${k}">${k}</button>`).join('')}</div>`; }
+stage.addEventListener('mousedown', e => { if (e.target.closest('[data-key]')) e.preventDefault(); });
+stage.addEventListener('click', e => {
+  const k = e.target.closest('[data-key]'); if (!k) return;
+  const inp = lastInput && document.body.contains(lastInput) ? lastInput : stage.querySelector('.inwrap input:not([readonly])');
+  if (!inp || inp.readOnly) return;
+  const s = inp.selectionStart ?? inp.value.length, en = inp.selectionEnd ?? inp.value.length;
+  inp.value = inp.value.slice(0, s) + k.dataset.key + inp.value.slice(en);
+  inp.focus(); inp.setSelectionRange(s + 1, s + 1);
+});
+function renderWrite() {
+  const p = pool();
+  if (!p.length) return emptyMsg();
+  if (!S.w) { const it = pickWeighted(p, S.last); S.last = it; S.w = {it, done: false, ok: false, val: ''}; }
+  S.score = S.score || {right: 0, total: 0};
+  const {it, done, ok, val} = S.w;
+  const prefix = it.kind === 'verb' ? 'å' : '';
+  stage.innerHTML = `
+    <div class="stage-top"><span class="label">Skriv ordet på norsk · type the Norwegian</span><span class="count">${S.score.right} / ${S.score.total} riktige</span></div>
+    <div class="prompt"><span class="tag">${esc(catLabel(it))}</span><div class="mid" style="font-size:1.6rem">${esc(it.en)}</div></div>
+    <form class="answer" id="wForm" autocomplete="off">
+      <div class="inwrap ${done ? (ok ? 'ok' : 'no') : ''}">${prefix ? `<span>${prefix}</span>` : ''}
+        <input id="wIn" value="${esc(val)}" ${done ? 'readonly' : ''} placeholder="Skriv her…" autocapitalize="off" spellcheck="false" aria-label="Svar på norsk"></div>
+      <div class="fix">${done ? (ok ? 'Riktig! ' + esc(it.no) : 'Riktig svar: ' + esc(it.no)) : ''}</div>
+      ${done && it.kind === 'verb' ? formsHTML(it) : ''}
+      ${done ? '' : keysHTML()}
+      <div class="actions">${done ? `<button class="btn primary" type="submit">Neste<kbd>Enter</kbd></button>${speakBtn(it.no)}` : '<button class="btn" type="button" id="wSkip">Vis svaret</button><button class="btn primary" type="submit">Sjekk<kbd>Enter</kbd></button>'}</div>
+    </form>`;
+  const inp = $('#wIn');
+  if (!done) inp.focus(); else $('#wForm button[type=submit]').focus();
+  $('#wForm').onsubmit = e => {
+    e.preventDefault();
+    if (S.w.done) { S.w = null; renderWrite(); return; }
+    writeCheck(inp.value);
+  };
+  const skip = $('#wSkip'); if (skip) skip.onclick = () => writeCheck('');
+}
+function writeCheck(v) {
+  const it = S.w.it;
+  const ok = isRight(v, it.no);
+  S.w.done = true; S.w.ok = ok; S.w.val = v;
+  S.score.total++; if (ok) S.score.right++;
+  mark(it, ok); renderDeck(); renderWrite();
+}
+
+/* ---- Conjugation ---- */
+function renderConj() {
+  const p = pool().filter(it => it.kind === 'verb');
+  if (!p.length) return emptyMsg('Bøying fungerer bare med verb. Velg «Verb» øverst. Verb forms only works with the verb list — pick “Verb” at the top.');
+  if (!S.c) { const it = pickWeighted(p, S.last); S.last = it; S.c = {it, done: false, vals: ['', '', ''], res: []}; }
+  S.score = S.score || {right: 0, total: 0};
+  const {it, done, vals, res} = S.c;
+  const fields = [['pres', 'Presens', ''], ['pret', 'Preteritum', ''], ['perf', 'Perfektum', 'har']];
+  stage.innerHTML = `
+    <div class="stage-top"><span class="label">Bøy verbet · conjugate the verb</span><span class="count">${S.score.right} / ${S.score.total} helt riktige</span></div>
+    <div class="prompt"><span class="tag">${esc(catLabel(it))}</span><div class="big">${esc(it.no)}</div><div class="hint" style="font-size:1rem">${esc(it.en)}</div></div>
+    <form class="answer" id="cForm" autocomplete="off">
+      ${fields.map(([k, lab, pre], i) => `<div class="field"><label for="c_${k}">${lab}</label>
+        <div class="inwrap ${done ? (res[i] ? 'ok' : 'no') : ''}">${pre ? `<span>${pre}</span>` : ''}<input id="c_${k}" value="${esc(vals[i])}" ${done ? 'readonly' : ''} autocapitalize="off" spellcheck="false"></div>
+        <div class="fix">${done && !res[i] ? esc((pre ? pre + ' ' : '') + it[k]) : ''}</div></div>`).join('')}
+      ${done ? '' : keysHTML()}
+      <div class="actions">${done ? `<button class="btn primary" type="submit">Neste<kbd>Enter</kbd></button>${speakBtn(`${it.no}, ${it.pres}, ${it.pret}, har ${it.perf}`)}` : '<button class="btn" type="button" id="cSkip">Vis svaret</button><button class="btn primary" type="submit">Sjekk<kbd>Enter</kbd></button>'}</div>
+    </form>`;
+  if (!done) $('#c_pres').focus(); else $('#cForm button[type=submit]').focus();
+  stage.querySelectorAll('#cForm input').forEach((inp, i, arr) => inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !done && i < 2 && !arr[i + 1].value) { e.preventDefault(); arr[i + 1].focus(); }
+  }));
+  $('#cForm').onsubmit = e => {
+    e.preventDefault();
+    if (S.c.done) { S.c = null; renderConj(); return; }
+    conjCheck(fields.map(([k]) => $('#c_' + k).value));
+  };
+  const skip = $('#cSkip'); if (skip) skip.onclick = () => conjCheck(['', '', '']);
+}
+function conjCheck(vals) {
+  const it = S.c.it;
+  const res = [isRight(vals[0], it.pres), isRight(vals[1], it.pret), isRight(vals[2], it.perf)];
+  const all = res.every(Boolean);
+  Object.assign(S.c, {done: true, vals, res});
+  S.score.total++; if (all) S.score.right++;
+  mark(it, all); renderDeck(); renderConj();
+}
+
+/* ---- List ---- */
+function renderList() {
+  const p = pool();
+  const q = S.search || '';
+  const showVerbs = p.some(it => it.kind === 'verb');
+  stage.innerHTML = `
+    <input class="search" id="lSearch" type="search" placeholder="Søk på norsk eller engelsk… / search" value="${esc(q)}" aria-label="Søk">
+    <div class="hint">Grønn prikk = lært, gul = på vei. Green dot = learned, yellow = in progress.</div>
+    <div class="tablewrap"><table><thead><tr><th></th><th>Norsk</th><th>English</th>${showVerbs ? '<th>Presens</th><th>Preteritum</th><th>Perfektum</th>' : ''}</tr></thead><tbody id="lBody"></tbody></table></div>`;
+  const body = $('#lBody');
+  function fill() {
+    const term = norm(S.search || '');
+    const rows = p.filter(it => !term || it.no.toLowerCase().includes(term) || it.en.toLowerCase().includes(term) ||
+      (it.kind === 'verb' && [it.pres, it.pret, it.perf].some(f => f.toLowerCase().includes(term))));
+    let cur = null, html = '';
+    const cols = showVerbs ? 6 : 3;
+    rows.forEach(it => {
+      const ck = it.kind + it.cat;
+      if (ck !== cur) { cur = ck; const c = CAT_INDEX[it.cat]; html += `<tr class="catrow"><td colspan="${cols}">${esc(it.kind === 'verb' ? 'Verb · ' + c.no : c.no)} · ${esc(c.en)}</td></tr>`; }
+      const b = box(it);
+      html += `<tr><td class="dot"><i class="${b >= LEARNED ? 'l' : b > 0 ? 'p' : ''}"></i></td><td class="no">${esc(it.no)}</td><td>${esc(it.en)}</td>${showVerbs ? (it.kind === 'verb' ? `<td class="f">${esc(it.pres)}</td><td class="f">${esc(it.pret)}</td><td class="f">har ${esc(it.perf)}</td>` : '<td></td><td></td><td></td>') : ''}</tr>`;
+    });
+    body.innerHTML = html || `<tr><td colspan="${cols}">Ingen treff.</td></tr>`;
+  }
+  fill();
+  $('#lSearch').addEventListener('input', e => { S.search = e.target.value; fill(); });
+}
+
+/* ---------------- ROUTER & KEYS ---------------- */
+function render() {
+  ({cards: renderCards, quiz: renderQuiz, match: renderMatch, write: renderWrite, conj: renderConj, list: renderList}[state.mode] || renderCards)();
+}
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (state.mode === 'cards' && S.queue && S.i < S.queue.length) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); $('#card').click(); }
+    else if (e.key === '1') cardAnswer(false);
+    else if (e.key === '2') cardAnswer(true);
+  } else if (state.mode === 'quiz' && S.q) {
+    if (!S.q.answered && /^[1-4]$/.test(e.key) && S.q.opts[+e.key - 1]) quizPick(+e.key - 1);
+    else if (S.q.answered && e.key === 'Enter') { e.preventDefault(); S.q = null; renderQuiz(); }
+  } else if (state.mode === 'match' && S.m && S.m.end && e.key === 'Enter') { e.preventDefault(); S.m = null; renderMatch(); }
+  else if (state.mode === 'cards' && S.queue && S.i >= S.queue.length && e.key === 'Enter') { resetSession(); render(); }
+});
+
+bindReset();
+updateStats(); renderDeck(); render();
+</script>
+
+</html>
