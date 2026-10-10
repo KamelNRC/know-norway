@@ -81,7 +81,9 @@
   .toggle input{width:18px;height:18px;accent-color:var(--accent)}
   .poolinfo{font-size:.9rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
   .bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+  .bar{display:flex}
   .bar i{display:block;height:100%;background:var(--good);width:0;transition:width .4s}
+  .bar i.p{background:#d4a017}
 
   /* Mode tabs */
   nav.modes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
@@ -189,6 +191,7 @@
     </div>
     <div class="stats" aria-label="Fremgang">
       <div class="stat"><b id="stLearned">0</b><span>lært / learned</span></div>
+      <div class="stat"><b id="stProgress">0</b><span>på vei / in progress</span></div>
       <div class="stat"><b id="stTotal">0</b><span>ord totalt</span></div>
     </div>
   </header>
@@ -198,6 +201,7 @@
       <div class="seg" role="group" aria-label="Ordliste">
         <button id="dVerb" data-deck="verb">Verb</button>
         <button id="dWord" data-deck="word">Ordforråd</button>
+        <button id="dEt" data-deck="et">Et-ord</button>
         <button id="dAll" data-deck="all">Alt</button>
       </div>
       <label class="toggle"><input type="checkbox" id="onlyNew"> Bare ord jeg ikke kan ennå</label>
@@ -205,8 +209,9 @@
     <div class="chips" id="chips"></div>
     <div class="row between">
       <span class="poolinfo" id="poolInfo"></span>
-      <div style="flex:1;min-width:140px;max-width:300px" class="bar"><i id="poolBar"></i></div>
+      <div style="flex:1;min-width:140px;max-width:300px" class="bar"><i id="poolBar"></i><i id="poolBarP" class="p"></i></div>
     </div>
+    <p class="hint" style="margin:0">Et ord er <b>lært</b> når du har svart riktig 3 ganger på rad. Ett riktig svar flytter ordet til <b>på vei</b>, et feil svar starter det på nytt. A word counts as learned after 3 correct answers in a row.</p>
   </section>
 
   <nav class="modes" aria-label="Øvingsmåte">
@@ -1409,6 +1414,50 @@ en pris|a price; a prize
 et tilbud|an offer; a sale
 en kvittering|a receipt
 en pose|a (plastic/paper) bag
+# etord|Flere et-ord|More et-words
+et sted|a place
+et navn|a name
+et ord|a word
+et spørsmål|a question
+et svar|an answer
+et problem|a problem
+et eksempel|an example
+et bilde|a picture
+et liv|a life
+et selskap|a company; a party
+et firma|a firm, a business
+et brev|a letter
+et nummer|a number (phone, house)
+et tall|a number (figure, digit)
+et øyeblikk|a moment
+et mål|a goal; a measure
+et resultat|a result
+et system|a system
+et program|a program
+et prosjekt|a project
+et dokument|a document
+et kontor|an office
+et område|an area
+et forhold|a relationship
+et behov|a need
+et ønske|a wish
+et håp|a hope
+et forsøk|an attempt
+et kort|a card
+et marked|a market
+et nabolag|a neighbourhood
+et lys|a light; a candle
+et kamera|a camera
+et studie|a study (research)
+et tegn|a sign, a symbol
+et arrangement|an event
+et tidspunkt|a point in time
+et ansvar|a responsibility
+et råd|a piece of advice
+et tema|a topic
+et nivå|a level
+et punkt|a point
+et krav|a requirement
 `;
 
 /* ---------------- BUILD ITEMS ---------------- */
@@ -1469,10 +1518,18 @@ function pickWeighted(list, avoid) {
   for (let i = 0; i < cand.length; i++) { r -= w[i]; if (r <= 0) return cand[i]; }
   return cand[cand.length - 1];
 }
+/* The et-deck is a view over the vocabulary: every noun written with "et", whatever its topic. */
+const isEt = it => it.kind === 'word' && it.no.startsWith('et ');
+const hasCats = () => state.deck === 'verb' || state.deck === 'word';
+function inDeck(it) {
+  if (state.deck === 'all') return true;
+  if (state.deck === 'et') return isEt(it);
+  return it.kind === state.deck;
+}
 function pool() {
   return ITEMS.filter(it => {
-    if (state.deck !== 'all' && it.kind !== state.deck) return false;
-    if (state.deck !== 'all' && state.cats.size && !state.cats.has(it.cat)) return false;
+    if (!inDeck(it)) return false;
+    if (hasCats() && state.cats.size && !state.cats.has(it.cat)) return false;
     if (state.onlyNew && box(it) >= LEARNED) return false;
     return true;
   });
@@ -1532,6 +1589,7 @@ function renderDeck() {
   $('#onlyNew').checked = state.onlyNew;
   const chips = $('#chips');
   if (state.deck === 'all') { chips.innerHTML = '<span class="hint">Alle verb og alle ord blandet. All verbs and words mixed.</span>'; }
+  else if (state.deck === 'et') { chips.innerHTML = '<span class="hint">Bare intetkjønnsord: <b>et</b> år, <b>et</b> barn, <b>et</b> hus. Only neuter nouns, the ones that take <b>et</b> in the singular (a/an), from every topic. The definite form ends in <b>-et</b>: huset, barnet.</span>'; }
   else {
     const list = CATS[state.deck];
     const count = k => ITEMS.filter(i => i.cat === k && i.kind === state.deck).length;
@@ -1539,16 +1597,19 @@ function renderDeck() {
       list.map(c => `<button class="chip" data-cat="${c.key}" aria-pressed="${state.cats.has(c.key)}" title="${esc(c.en)}">${esc(c.no)} <small>${count(c.key)}</small></button>`).join('');
   }
   const p = pool();
-  const base = ITEMS.filter(it => (state.deck === 'all' || it.kind === state.deck) && (state.deck === 'all' || !state.cats.size || state.cats.has(it.cat)));
+  const base = ITEMS.filter(it => inDeck(it) && (!hasCats() || !state.cats.size || state.cats.has(it.cat)));
   const learned = base.filter(it => box(it) >= LEARNED).length;
-  $('#poolInfo').textContent = `${p.length} ord i øvelsen · ${learned} av ${base.length} lært`;
+  const started = base.filter(it => box(it) > 0 && box(it) < LEARNED).length;
+  $('#poolInfo').textContent = `${p.length} ord i øvelsen · ${learned} lært · ${started} på vei · ${base.length - learned - started} nye`;
   $('#poolBar').style.width = (base.length ? learned / base.length * 100 : 0) + '%';
+  $('#poolBarP').style.width = (base.length ? started / base.length * 100 : 0) + '%';
   document.querySelectorAll('[data-mode]').forEach(b => {
     b.setAttribute('aria-pressed', b.dataset.mode === state.mode);
   });
 }
 function updateStats() {
   $('#stLearned').textContent = ITEMS.filter(it => box(it) >= LEARNED).length;
+  $('#stProgress').textContent = ITEMS.filter(it => box(it) > 0 && box(it) < LEARNED).length;
   $('#stTotal').textContent = ITEMS.length;
 }
 document.querySelectorAll('[data-deck]').forEach(b => b.addEventListener('click', () => {
@@ -1652,7 +1713,7 @@ function cardAnswer(ok) {
 /* ---- Quiz ---- */
 function renderQuiz() {
   const p = pool();
-  const all = ITEMS.filter(it => state.deck === 'all' || it.kind === state.deck);
+  const all = ITEMS.filter(inDeck);
   if (!p.length) return emptyMsg();
   if (!S.q) newQuiz(p, all);
   const {it, opts, answered, pick} = S.q;
