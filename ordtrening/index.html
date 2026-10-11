@@ -275,6 +275,7 @@ hoste|hoster|hostet|hostet|cough
 høste|høster|høstet|høstet|harvest
 huske|husker|husket|husket|remember
 hoppe|hopper|hoppet|hoppet|jump
+hugge|hugger|hugget/hogg|hugget|chop, cut
 hviske|hvisker|hvisket|hvisket|whisper
 hygge seg|hygger seg|hygget seg|hygget seg|have a nice time, enjoy oneself
 jobbe|jobber|jobbet|jobbet|work
@@ -356,6 +357,15 @@ endre|endrer|endret|endret|change
 støtte|støtter|støttet|støttet|support
 pugge|pugger|pugget|pugget|cram, learn by heart
 virke|virker|virket|virket|seem; work, have an effect
+ta med|tar med|tok med|tatt med|bring, take along
+koble av|kobler av|koblet av|koblet av|unwind, switch off
+prate|prater|pratet|pratet|chat, talk
+mangle|mangler|manglet|manglet|lack, be missing
+utforske|utforsker|utforsket|utforsket|explore
+forbedre|forbedrer|forbedret|forbedret|improve
+forurense|forurenser|forurenset|forurenset|pollute
+begrunne|begrunner|begrunnet|begrunnet|give reasons for, justify
+lage mat|lager mat|laget mat|laget mat|cook
 # te
 anbefale|anbefaler|anbefalte|anbefalt|recommend
 barbere|barberer|barberte|barbert|shave
@@ -487,12 +497,28 @@ sortere|sorterer|sorterte|sortert|sort
 kildesortere|kildesorterer|kildesorterte|kildesortert|sort waste for recycling
 oppføre seg|oppfører seg|oppførte seg|oppført seg|behave
 klare seg|klarer seg|klarte seg|klart seg|manage, get by
+arrestere|arresterer|arresterte|arrestert|arrest
+vokse opp|vokser opp|vokste opp|vokst opp|grow up
+redusere|reduserer|reduserte|redusert|reduce
+produsere|produserer|produserte|produsert|produce
+investere|investerer|investerte|investert|invest
+dekorere|dekorerer|dekorerte|dekorert|decorate
+inkludere|inkluderer|inkluderte|inkludert|include
+integrere|integrerer|integrerte|integrert|integrate
+respektere|respekterer|respekterte|respektert|respect
+presentere seg|presenterer seg|presenterte seg|presentert seg|introduce oneself
+resirkulere|resirkulerer|resirkulerte|resirkulert|recycle
+inspirere|inspirerer|inspirerte|inspirert|inspire
+motivere|motiverer|motiverte|motivert|motivate
+engasjere seg|engasjerer seg|engasjerte seg|engasjert seg|get involved
+akseptere|aksepterer|aksepterte|akseptert|accept
+spare penger|sparer penger|sparte penger|spart penger|save money
+stole på|stoler på|stolte på|stolt på|trust, rely on
 # de
 bygge|bygger|bygde|bygd|build
 dø|dør|døde|dødd|die
 eie|eier|eide|eid|own
 greie|greier|greide|greid|manage (to do)
-hogge|hogger|hogde|hogd|chop, cut
 leie|leier|leide|leid|rent
 leve|lever|levde|levd|live, be alive
 pleie|pleier|pleide|pleid|usually do, be used to; nurse
@@ -512,6 +538,7 @@ skru|skrur|skrudde|skrudd|screw; turn (on/off)
 snø|snør|snødde|snødd|snow
 sy|syr|sydde|sydd|sew
 tro|tror|trodde|trodd|believe, think
+oppnå|oppnår|oppnådde|oppnådd|achieve
 # sterk
 ansette|ansetter|ansatte|ansatt|hire, employ
 avbryte|avbryter|avbrøt|avbrutt|interrupt
@@ -594,7 +621,6 @@ overdrive|overdriver|overdrev/overdreiv|overdrevet|exaggerate
 overskrive|overskriver|overskrev|overskrevet|overwrite
 overta|overtar|overtok|overtatt|take over
 pipe|piper|peip|pepet|chirp, beep
-pågripe|pågriper|pågrep|pågrepet|arrest
 rekke|rekker|rakk|rukket|reach; have time for; catch (a bus)
 rekke|rekker|rakte|rakt|hand, pass; stretch out
 renne|renner|rant|rent|run, flow
@@ -659,6 +685,19 @@ vri|vrir|vred/vrei|vridd|twist
 ødelegge|ødelegger|ødela|ødelagt|destroy, ruin
 planlegge|planlegger|planla|planlagt|plan
 oppgi|oppgir|oppga|oppgitt|state, give (information)
+skrive under|skriver under|skrev under|skrevet under|sign
+sette pris på|setter pris på|satte pris på|satt pris på|appreciate
+bli kjent med|blir kjent med|ble kjent med|blitt kjent med|get to know
+oversette|oversetter|oversatte|oversatt|translate
+motta|mottar|mottok|mottatt|receive
+oppdra|oppdrar|oppdro|oppdratt|bring up, raise (children)
+avhenge av|avhenger av|avhang av|avhengt av|depend on
+ta ansvar|tar ansvar|tok ansvar|tatt ansvar|take responsibility
+gå glipp av|går glipp av|gikk glipp av|gått glipp av|miss out on
+ha råd til|har råd til|hadde råd til|hatt råd til|afford
+gjøre feil|gjør feil|gjorde feil|gjort feil|make a mistake
+ta bilder|tar bilder|tok bilder|tatt bilder|take photos
+lykkes|lykkes|lyktes|lyktes|succeed
 `;
 
 const VERB_GROUPS = {
@@ -813,6 +852,7 @@ tiende|tenth
 halv|half
 en halvdel|a half
 et par|a couple, a pair
+halvparten|half (of something)
 # tid|Tid og kalender|Time & calendar
 mandag|Monday
 tirsdag|Tuesday
@@ -876,6 +916,11 @@ for … siden|… ago
 kvart over|quarter past
 kvart på|quarter to
 halv tre|half past two (2:30)
+i fjor|last year
+neste år|next year
+i helgen|at the weekend
+om sommeren|in (the) summer
+til hverdags|on weekdays, in everyday life
 # familie|Familie og mennesker|Family & people
 en familie|a family
 ei mor|a mother
@@ -930,6 +975,13 @@ en kjærlighet|love
 et familieliv|family life
 en alder|an age
 et kjønn|a gender, a sex
+singel|single
+en partner|a partner
+en oppvekst|an upbringing, growing up
+en oppdragelse|an upbringing (how children are raised)
+en barndom|a childhood
+en pensjonist|a pensioner
+de eldre|the elderly
 # kropp|Kropp og helse|Body & health
 et hode|a head
 et hår|a hair
@@ -992,6 +1044,11 @@ en trening|training, exercise
 ei treningsøkt|a workout session
 et utstyr|equipment
 en svette|sweat
+et kosthold|a diet
+en livsstil|a lifestyle
+en søvn|sleep
+psykisk helse|mental health
+en overvekt|overweight, obesity
 # hjem|Hjemmet|Home
 et hjem|a home
 et hus|a house
@@ -1042,6 +1099,12 @@ en plass|space, room; a place
 en beliggenhet|a location
 en utsikt|a view
 en boligpris|a housing price
+ei blokk|an apartment block
+en enebolig|a detached house
+et boliglån|a mortgage
+en egenkapital|savings for a down payment, equity
+en kvadratmeter|a square metre
+et kollektiv|a shared house
 # mat|Mat og drikke|Food & drink
 en mat|food
 en frokost|a breakfast
@@ -1128,6 +1191,12 @@ en baking|baking
 en blanding|a mix, a mixture
 en kafé|a café
 en fest|a party
+en rett|a dish
+ei matpakke|a packed lunch
+halal|halal
+et julebord|a Christmas party (often with work)
+ei kjøttkake|a (Norwegian) meatball
+en vaffel|a waffle
 # klaer|Klær|Clothes
 klær|clothes
 ei jakke|a jacket
@@ -1202,7 +1271,7 @@ en trikk|a tram
 en T-bane|a metro, underground
 et fly|a plane
 en båt|a boat
-ei ferje|a ferry
+ei ferge|a ferry
 en sykkel|a bicycle
 en drosje / taxi|a taxi
 en billett|a ticket
@@ -1221,6 +1290,9 @@ en flytur|a flight
 et flyselskap|an airline
 et drivstoff|fuel
 en avstand|a distance
+en bensin|petrol, gasoline
+en kollektivtransport|public transport
+en elbil|an electric car
 # arbeid|Arbeid og skole|Work & school
 en jobb|a job
 et arbeid|work, labour
@@ -1302,6 +1374,21 @@ en rutine|a routine
 en struktur|a structure
 et verktøy|a tool
 en tjeneste|a service
+en ansatt|an employee
+en leder|a leader, a manager
+ei arbeidserfaring|work experience
+ei arbeidsoppgave|a work task
+en forretningsanalytiker|a business analyst
+en konditor|a pastry chef
+en kompetanse|competence, skills
+en jobbmulighet|a job opportunity
+et introduksjonsprogram|an introduction programme (for refugees)
+et norskkurs|a Norwegian course
+en grammatikk|grammar
+en barneskole|a primary school
+en ungdomsskole|a lower secondary school
+en lærling|an apprentice
+et arbeidsmiljø|a working environment
 # natur|Natur og vær|Nature & weather
 et vær|weather
 ei sol|sun
@@ -1347,6 +1434,11 @@ et søppel|rubbish, trash
 en ressurs|a resource
 en strøm|electricity; a current
 et friluftsliv|outdoor life
+et klima|a climate
+klimaendringer|climate change
+et utslipp|an emission
+en plast|plastic
+en gjenbruk|reuse
 # dyr|Dyr|Animals
 en hund|a dog
 ei katt|a cat
@@ -1562,6 +1654,42 @@ gal|wrong; crazy
 ærlig|honest
 oppdatert|updated, up to date
 hverdagslig|everyday, ordinary
+sakte|slow, slowly
+nydelig|lovely, gorgeous
+utrolig|incredible; incredibly
+fantastisk|fantastic
+bevisst|aware, conscious
+flerkulturell|multicultural
+respektfull|respectful
+generøs|generous
+fornuftig|sensible
+obligatorisk|compulsory
+begrenset|limited
+rimelig|reasonable, affordable
+uformell|informal
+formell|formal
+teoretisk|theoretical
+fysisk|physical
+psykisk|mental, psychological
+økonomisk|financial, economic
+meningsfull|meaningful
+berikende|enriching
+ekskludert|excluded
+ensom|lonely
+gøy|fun
+deilig|delicious; lovely
+nyankommen|newly arrived
+passiv|passive
+tolerant|tolerant
+vennlig|friendly
+sjenert|shy
+utadvendt|outgoing
+bærekraftig|sustainable
+tilpasset|adapted, adjusted
+stresset|stressed
+misfornøyd|dissatisfied
+takknemlig|grateful
+likeverdig|equal (in worth)
 # smaord|Småord|Small words: links & adverbs
 og|and
 eller|or
@@ -1673,6 +1801,27 @@ flere|more; several
 fleste|most
 minst|least, at least
 enkelte|some, certain
+sånne|such (ones), like that
+dessuten|besides, moreover
+absolutt|absolutely
+definitivt|definitely
+altså|so, that is
+riktignok|admittedly
+foreløpig|for now, so far
+ettersom|since, as
+fremfor|rather than
+overalt|everywhere
+underveis|on the way
+ikke nødvendigvis|not necessarily
+regelmessig|regularly
+mesteparten|most (of it)
+til og med|even
+stort sett|mostly, generally
+for det meste|mostly
+innenfor|within, inside
+dermed|thus, so
+slik at|so that
+av og til|sometimes, now and then
 # preposisjon|Preposisjoner|Prepositions
 i|in
 på|on; at
@@ -1838,6 +1987,33 @@ et fokus|a focus
 en selvstendighet|independence
 en utvikling|a development
 en nytte|use, benefit
+ei integrering|integration
+ei inkludering|inclusion
+en fordom|a prejudice (pl. fordommer)
+en verdi|a value
+et forbruk|consumption
+en produksjon|production
+en velferd|welfare
+en velferdsstat|a welfare state
+en inntekt|an income
+et tiltak|a measure, an action
+et perspektiv|a perspective
+ei holdning|an attitude
+en forståelse|an understanding
+en identitet|an identity
+en generøsitet|generosity
+en rolle|a role
+en befolkning|a population
+en generasjon|a generation
+ei innvandring|immigration
+en arbeidsledighet|unemployment
+et fellesskap|a community, togetherness
+det offentlige|the public sector, public services
+en likhet|a similarity
+en jul|Christmas
+ei påske|Easter
+en id|Eid
+en ramadan|Ramadan
 # medier|Medier og teknologi|Media & technology
 en teknologi|technology
 sosiale medier|social media
@@ -1862,6 +2038,16 @@ en bruker|a user
 en følger|a follower
 en influenser|an influencer
 en elektronikk|electronics
+en strømmetjeneste|a streaming service
+ei skjermtid|screen time
+en kanal|a channel
+en feilinformasjon|misinformation
+et innlegg|a post (social media)
+en kunstig intelligens|artificial intelligence
+en mobiltelefon|a mobile phone
+en nettside|a website
+et TV-program|a TV programme
+en avis|a newspaper
 # uttrykk|Faste uttrykk|Set phrases
 i tillegg|in addition
 først og fremst|first and foremost
@@ -1895,6 +2081,7 @@ for alvor|for real, seriously
 for … skyld|for the sake of …
 tenke seg om|think it over
 i stor skala|on a large scale
+jeg synes at …|I think that …
 # etord|Flere et-ord|More et-words
 et sted|a place
 et navn|a name
@@ -1939,6 +2126,61 @@ et tema|a topic
 et nivå|a level
 et punkt|a point
 et krav|a requirement
+# fritid|Fritid og hobbyer|Free time & hobbies
+en hobby|a hobby
+en fottur|a hike
+en spasertur|a stroll, a walk
+gå på tur|go for a walk, go hiking
+gå på ski|go skiing
+ei hytte|a cabin
+en konsert|a concert
+en film|a film
+et spill|a game
+en sport|a sport
+en idrett|sport(s), athletics
+en fotball|a football; football
+et fotografi|a photograph
+en fotograf|a photographer
+ha fri|be off work, have time off
+# muntlig|Muntlig eksamen|Oral exam phrases
+det er et godt spørsmål|that's a good question
+det er et vanskelig spørsmål|that's a difficult question
+la meg tenke litt|let me think a little
+kan du gjenta spørsmålet, er du snill?|can you repeat the question, please?
+jeg tror at …|I believe that …
+jeg mener at …|I'm of the opinion that …
+jeg er enig|I agree
+jeg er uenig|I disagree
+jeg er helt enig|I completely agree
+jeg er litt uenig i det|I disagree a bit with that
+jeg forstår begge sider|I understand both sides
+det positive er …|the good thing is …
+det negative er …|the bad thing is …
+fordeler og ulemper|advantages and disadvantages
+for meg er det viktig at …|for me it's important that …
+selv har jeg …|I myself have …
+for min egen del|personally, as for me
+for det første|firstly
+for det andre|secondly
+sammenlignet med|compared with
+i motsetning til|unlike, in contrast to
+ikke bare … men også|not only … but also
+blant annet|among other things
+det handler om …|it's about …
+det henger sammen med …|it's connected with …
+så lenge|as long as
+alt i alt|all in all
+så alt i alt synes jeg at …|so all in all I think that …
+derfor mener jeg at …|that's why I think that …
+det beste med … er …|the best thing about … is …
+det viktigste er …|the most important thing is …
+hvis jeg skal være ærlig|to be honest
+jeg har ikke tenkt på det før|I haven't thought about that before
+hva mener du?|what do you think?
+kan du forklare hva du mener?|can you explain what you mean?
+det er sant|that's true
+det kan godt være|that may well be
+jeg vet ikke helt|I'm not quite sure
 `;
 
 /* ---------------- BUILD ITEMS ---------------- */
