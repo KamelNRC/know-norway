@@ -2114,21 +2114,30 @@ function buildQuiz(container, questions, opts){
 function record(list, score, total){ list.push({date:today(), t:Date.now(), score, total}); }
 
 
-/* a question shown in a mock exam is held back for the next MOCK_GAP rounds */
-const MOCK_GAP = 2;
-function pickMock(pool, n){
-  const lang = state.lang;
-  state.mockRecent = state.mockRecent || {};
-  const recent = state.mockRecent[lang] || [];
+/* questions are not repeated until every question in the pool has been shown once */
+function pickFresh(key, pool, n){
+  state.seenQs = state.seenQs || {};
   const texts = new Set();
   pool = pool.filter(q=>!texts.has(q[0]) && texts.add(q[0]));
-  const seen = new Set([].concat(...recent));
+  let seenList = state.seenQs[key];
+  if(!seenList){ const old = (state.mockRecent||{})[key.split(':')[1]]; seenList = key.startsWith('mock:') && old ? [].concat(...old) : []; }
+  const seen = new Set(seenList.filter(t=>texts.has(t)));
   const fresh = shuffle(pool.filter(q=>!seen.has(q[0])));
-  const picked = fresh.length>=n ? fresh.slice(0,n) : fresh.concat(shuffle(pool.filter(q=>seen.has(q[0]))).slice(0,n-fresh.length));
-  state.mockRecent[lang] = recent.concat([picked.map(q=>q[0])]).slice(-MOCK_GAP);
+  let picked;
+  if(fresh.length>=n){
+    picked = fresh.slice(0,n);
+    picked.forEach(q=>seen.add(q[0]));
+  } else {
+    /* pool used up: finish it, then start a new round with the rest */
+    const refill = shuffle(pool.filter(q=>seen.has(q[0]))).slice(0,n-fresh.length);
+    picked = shuffle(fresh.concat(refill));
+    seen.clear(); refill.forEach(q=>seen.add(q[0]));
+  }
+  state.seenQs[key] = [...seen];
   saveState();
   return picked;
 }
+function pickMock(pool, n){ return pickFresh('mock:'+state.lang, pool, n); }
 let mockRun = null;
 function startMockExam(){
   if(mockRun){ mockRun.stop(); mockRun = null; }
