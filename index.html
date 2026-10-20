@@ -2114,6 +2114,21 @@ function buildQuiz(container, questions, opts){
 function record(list, score, total){ list.push({date:today(), t:Date.now(), score, total}); }
 
 
+/* a question shown in a mock exam is held back for the next MOCK_GAP rounds */
+const MOCK_GAP = 2;
+function pickMock(pool, n){
+  const lang = state.lang;
+  state.mockRecent = state.mockRecent || {};
+  const recent = state.mockRecent[lang] || [];
+  const texts = new Set();
+  pool = pool.filter(q=>!texts.has(q[0]) && texts.add(q[0]));
+  const seen = new Set([].concat(...recent));
+  const fresh = shuffle(pool.filter(q=>!seen.has(q[0])));
+  const picked = fresh.length>=n ? fresh.slice(0,n) : fresh.concat(shuffle(pool.filter(q=>seen.has(q[0]))).slice(0,n-fresh.length));
+  state.mockRecent[lang] = recent.concat([picked.map(q=>q[0])]).slice(-MOCK_GAP);
+  saveState();
+  return picked;
+}
 let mockRun = null;
 function startMockExam(){
   if(mockRun){ mockRun.stop(); mockRun = null; }
@@ -2124,7 +2139,7 @@ function startMockExam(){
     '<button class="btn btn-primary btn-block" id="startMockBtn">'+T('startMock')+'</button>';
   $('startMockBtn').onclick = ()=>{
     const b = quizBank();
-    mockRun = buildQuiz(area, shuffle([...b.m1, ...b.m2, ...b.m3]).slice(0,38), {
+    mockRun = buildQuiz(area, pickMock([...b.m1, ...b.m2, ...b.m3], 38), {
       passLine:26, minutes:60,
       onRestart: startMockExam, onQuit: startMockExam,
       onFinish: (score,total)=>{ record(state.mock,score,total); saveState(); }
